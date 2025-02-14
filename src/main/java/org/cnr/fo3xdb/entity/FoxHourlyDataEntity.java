@@ -29,8 +29,8 @@ public class FoxHourlyDataEntity {
     @Column(name="air_temperature_avg", length = 50)
     private Double airTemperatureAvg;
 
-    @Column(name="air_humidity", length = 50)
-    private Double airHumidity;
+    @Column(name="air_humidity_avg", length = 50)
+    private Double airHumidityAvg;
 
     @Column(name="dew_point", length = 50)
     private Double dewPoint;

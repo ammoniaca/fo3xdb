@@ -4,12 +4,17 @@ package org.cnr.fo3xdb.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class FoxHourlyDataDTO {
+
+    @JsonProperty("timeStamp")
+    private LocalDateTime date;
 
     @JsonProperty("rainTotal")
     private Double rainTotal;
@@ -26,8 +31,8 @@ public class FoxHourlyDataDTO {
     @JsonProperty("airTemperatureAvg")
     private Double airTemperatureAvg;
 
-    @JsonProperty("airHumidity")
-    private Double airHumidity;
+    @JsonProperty("airHumidityAvg")
+    private Double airHumidityAvg;
 
     @JsonProperty("dewPoint")
     private Double dewPoint;
