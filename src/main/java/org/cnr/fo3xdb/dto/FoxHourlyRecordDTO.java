@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Setter
 @Getter
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 public class FoxHourlyRecordDTO {
 
     @JsonProperty("timeStamp")
-    private LocalDateTime date;
+    private Date date;
 
     @JsonProperty("rainTotal")
     private Double rainTotal;
