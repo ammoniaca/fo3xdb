@@ -2,11 +2,17 @@ package org.cnr.fo3xdb.entity;
 
 
 import jakarta.persistence.*;
+import lombok.*;
 
 
-
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Getter
+@Setter
 @Table(name = "fox_hourly")
-public class FoxHourlyDataEntity {
+public class FoxHourlyRecordEntity {
 
     @Id
     @GeneratedValue(

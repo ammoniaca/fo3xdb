@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FoxHourlyDataDTO {
+public class FoxHourlyRecordDTO {
 
     @JsonProperty("timeStamp")
     private LocalDateTime date;
