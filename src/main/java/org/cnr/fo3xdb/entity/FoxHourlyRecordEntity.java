@@ -4,13 +4,15 @@ package org.cnr.fo3xdb.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Getter
 @Setter
+@Builder
 @Table(name = "fox_hourly")
 public class FoxHourlyRecordEntity {
 
@@ -20,9 +22,13 @@ public class FoxHourlyRecordEntity {
     )
     private long id;
 
+    @Column(name="time_stamp", length = 50)
+    private LocalDateTime timeStamp;
+
     @Column(name="rain_total", length = 50)
     private Double rainTotal;
 
+    @Setter(AccessLevel.NONE)
     @Column(name="rain_intensity_max", length = 50)
     private Double rainIntensityMax;
 

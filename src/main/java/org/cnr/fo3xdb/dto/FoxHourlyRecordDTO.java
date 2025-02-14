@@ -15,7 +15,7 @@ import java.util.Date;
 public class FoxHourlyRecordDTO {
 
     @JsonProperty("timeStamp")
-    private Date date;
+    private LocalDateTime timeStamp;
 
     @JsonProperty("rainTotal")
     private Double rainTotal;
@@ -91,6 +91,5 @@ public class FoxHourlyRecordDTO {
 
     @JsonProperty("windMeasurementErrors")
     private Double windMeasurementErrors;
-
 
 }
