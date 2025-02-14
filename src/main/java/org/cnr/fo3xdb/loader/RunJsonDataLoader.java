@@ -1,10 +1,7 @@
 package org.cnr.fo3xdb.loader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cnr.fo3xdb.dto.FoxHourlyRecordDTO;
-import org.cnr.fo3xdb.entity.FoxHourlyRecordEntity;
 import org.cnr.fo3xdb.repository.FoxHourlyRecordRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -14,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 @Component
 public class RunJsonDataLoader implements CommandLineRunner {
