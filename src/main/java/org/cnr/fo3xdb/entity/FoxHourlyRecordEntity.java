@@ -4,7 +4,9 @@ package org.cnr.fo3xdb.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 
 @Entity
@@ -22,13 +24,13 @@ public class FoxHourlyRecordEntity {
     )
     private long id;
 
-    @Column(name="time_stamp", length = 50)
-    private LocalDateTime timeStamp;
+    @Setter(AccessLevel.NONE)
+    @Column(name="timestamp", length = 50)
+    private OffsetDateTime timestamp;
 
     @Column(name="rain_total", length = 50)
     private Double rainTotal;
 
-    @Setter(AccessLevel.NONE)
     @Column(name="rain_intensity_max", length = 50)
     private Double rainIntensityMax;
 
@@ -101,5 +103,8 @@ public class FoxHourlyRecordEntity {
     @Column(name="wind_measurement_errors", length = 50)
     private Double windMeasurementErrors;
 
-
+    public void setTimestamp(OffsetDateTime timestamp) {
+        ZonedDateTime romeZonedDateTime = timestamp.atZoneSameInstant(ZoneId.of("Europe/Rome"));
+        this.timestamp = romeZonedDateTime.toOffsetDateTime();
+    }
 }

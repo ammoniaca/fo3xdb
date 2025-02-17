@@ -28,11 +28,11 @@ public class RunJsonDataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if(repository.count() == 0){
             try(InputStream inputStream = TypeReference.class.getResourceAsStream("/data/records.json")){
-            RecordsFox AllRecords = objectMapper.readValue(inputStream, RecordsFox.class);
+            FoxRecords AllRecords = objectMapper.readValue(inputStream, FoxRecords.class);
             log.info("Reading {} runs from JSON data and saving to in-memory collection.", AllRecords.records().size());
             repository.saveAll(AllRecords.records());
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to read JSON data", e);
+            } catch (IOException ex) {
+                throw new RuntimeException("Failed to read JSON data", ex);
             }
         } else {
             log.info("Not loading Runs from JSON data because the collection contains data.");

@@ -4,18 +4,20 @@ package org.cnr.fo3xdb.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
-@Setter
 @Getter
-@Builder
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class FoxHourlyRecordDTO {
 
-    @JsonProperty("timeStamp")
-    private LocalDateTime timeStamp;
+    @JsonProperty("timestamp")
+    private OffsetDateTime timestamp;
 
     @JsonProperty("rainTotal")
     private Double rainTotal;
@@ -91,5 +93,17 @@ public class FoxHourlyRecordDTO {
 
     @JsonProperty("windMeasurementErrors")
     private Double windMeasurementErrors;
+
+    public void setTimestamp(OffsetDateTime timestamp) {
+        ZonedDateTime romeZonedDateTime = timestamp.atZoneSameInstant(ZoneId.of("Europe/Rome"));
+        this.timestamp = romeZonedDateTime.toOffsetDateTime();
+    }
+
+
+    private OffsetDateTime convertToOffsetDateTime(String utcTimeString){
+        Instant instant = Instant.parse(utcTimeString);
+        return instant.atZone(ZoneId.of("Europe/Rome")).toOffsetDateTime();
+    }
+
 
 }
