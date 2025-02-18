@@ -10,7 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 public class FoxHourlyMetadataDTO {
 
-
     @JsonProperty("rainTotal")
     private String rainTotal;
 
