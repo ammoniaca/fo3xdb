@@ -22,6 +22,18 @@ public class FoxHourlyMetadataEntity {
     )
     private long id;
 
+    @Column(name="time", length = 30)
+    private String time;
+
+    @Column(name="timezone", length = 30)
+    private String timezone;
+
+//    @Column(name="timezone_abbreviation", length = 10)
+//    private String timezoneAbbreviation;
+//
+//    @Column(name="utc_offset_seconds", length = 10)
+//    private Integer utcOffsetSeconds;
+
     @Column(name="rain_total", length = 15)
     private String rainTotal;
 
