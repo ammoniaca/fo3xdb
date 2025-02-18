@@ -10,19 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 public class FoxHourlyMetadataDTO {
 
-    @JsonProperty("time")
-    private String time;
-
-    @JsonProperty("timezone")
-    private String timezone;
-
-//    //"timezone_abbreviation": "GMT+1"
-//    @JsonProperty("timezoneAbbreviation")
-//    private String timezoneAbbreviation;
-//
-//    // utc_offset_seconds
-//    @JsonProperty("utcOffsetSeconds")
-//    private Integer utcOffsetSeconds;
 
     @JsonProperty("rainTotal")
     private String rainTotal;
