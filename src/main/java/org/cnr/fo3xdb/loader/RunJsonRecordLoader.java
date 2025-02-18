@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @Component
-public class RunJsonDataLoader implements CommandLineRunner {
+public class RunJsonRecordLoader implements CommandLineRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(RunJsonDataLoader.class);
+    private static final Logger log = LoggerFactory.getLogger(RunJsonRecordLoader.class);
     private final FoxHourlyRecordRepository repository;
     private final ObjectMapper objectMapper;
 
-    public RunJsonDataLoader(FoxHourlyRecordRepository repository, ObjectMapper mapper){
+    public RunJsonRecordLoader(FoxHourlyRecordRepository repository, ObjectMapper mapper){
         this.repository = repository;
         this.objectMapper = mapper;
     }
@@ -29,13 +29,13 @@ public class RunJsonDataLoader implements CommandLineRunner {
         if(repository.count() == 0){
             try(InputStream inputStream = TypeReference.class.getResourceAsStream("/data/records.json")){
             FoxRecords AllRecords = objectMapper.readValue(inputStream, FoxRecords.class);
-            log.info("Reading {} runs from JSON data and saving to in-memory collection.", AllRecords.records().size());
+            log.info("Reading {} records from JSON data and saving to in-memory collection.", AllRecords.records().size());
             repository.saveAll(AllRecords.records());
             } catch (IOException ex) {
                 throw new RuntimeException("Failed to read JSON data", ex);
             }
         } else {
-            log.info("Not loading Runs from JSON data because the collection contains data.");
+            log.info("Not loading records from JSON data because the collection contains data.");
         }
     }
 }

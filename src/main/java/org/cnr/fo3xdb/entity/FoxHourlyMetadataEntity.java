@@ -22,10 +22,10 @@ public class FoxHourlyMetadataEntity {
     )
     private long id;
 
-    @Column(name="time", length = 10)
+    @Column(name="time", length = 30)
     private String time;
 
-    @Column(name="timezone", length = 10)
+    @Column(name="timezone", length = 30)
     private String timezone;
 
 //    @Column(name="timezone_abbreviation", length = 10)
@@ -34,82 +34,79 @@ public class FoxHourlyMetadataEntity {
 //    @Column(name="utc_offset_seconds", length = 10)
 //    private Integer utcOffsetSeconds;
 
-    @Column(name="rain_total", length = 10)
+    @Column(name="rain_total", length = 15)
     private String rainTotal;
 
-    @Column(name="rain_intensity_max", length = 10)
+    @Column(name="rain_intensity_max", length = 20)
     private String rainIntensityMax;
 
-    @Column(name="air_temperature_min", length = 10)
+    @Column(name="air_temperature_min", length = 20)
     private String airTemperatureMin;
 
-    @Column(name="air_temperature_max", length = 10)
+    @Column(name="air_temperature_max", length = 20)
     private String airTemperatureMax;
 
-    @Column(name="air_temperature_avg", length = 10)
+    @Column(name="air_temperature_avg", length = 20)
     private String airTemperatureAvg;
 
-    @Column(name="air_humidity_avg", length = 10)
+    @Column(name="air_humidity_avg", length = 18)
     private String airHumidityAvg;
 
     @Column(name="dew_point", length = 10)
     private String dewPoint;
 
-    @Column(name="air_pressure_avg", length = 10)
+    @Column(name="air_pressure_avg", length = 18)
     private String airPressureAvg;
 
-    @Column(name="solar_radiation_min", length = 10)
+    @Column(name="solar_radiation_min", length = 20)
     private String solarRadiationMin;
 
-    @Column(name="solar_radiation_avg", length = 10)
+    @Column(name="solar_radiation_avg", length = 20)
     private String solarRadiationAvg;
 
-    @Column(name="solar_radiation_max", length = 10)
+    @Column(name="solar_radiation_max", length = 20)
     private String solarRadiationMax;
 
-    @Column(name="wind_speed_avg", length = 10)
+    @Column(name="wind_speed_avg", length = 16)
     private String windSpeedAvg;
 
-    @Column(name="wind_direction_avg", length = 10)
+    @Column(name="wind_direction_avg", length = 20)
     private String windDirectionAvg;
 
-    @Column(name="wind_direction_std", length = 10)
+    @Column(name="wind_direction_std", length = 20)
     private String windDirectionSTD;
 
-    @Column(name="wind_speed_max", length = 10)
+    @Column(name="wind_speed_max", length = 16)
     private String windSpeedMax;
 
-    @Column(name="wind_direction_at_maximum_speed", length = 10)
-    private Double windDirectionAtMaximumSpeed;
+    @Column(name="wind_direction_at_maximum_speed", length = 32)
+    private String windDirectionAtMaximumSpeed;
 
-    @Column(name="evapotranspiration", length = 10)
-    private Double evapotranspiration;
+    @Column(name="evapotranspiration", length = 20)
+    private String evapotranspiration;
 
-    @Column(name="solar_radiation_calculated", length = 10)
-    private Double solarRadiationCalculated;
+    @Column(name="solar_radiation_calculated", length = 30)
+    private String solarRadiationCalculated;
 
-    @Column(name="battery_voltage", length = 10)
-    private Double batteryVoltage;
+    @Column(name="battery_voltage", length = 18)
+    private String batteryVoltage;
 
-    @Column(name="data_logger_temperature", length = 10)
-    private Double dataLoggerTemperature;
+    @Column(name="data_logger_temperature", length = 25)
+    private String dataLoggerTemperature;
 
-    @Column(name="air_temperature_measurement_errors", length = 10)
-    private Double airTemperatureMeasurementErrors;
-
-    @Column(name="air_humidity_measurement_errors", length = 10)
-    private Double airHumidityMeasurementErrors;
-
-    @Column(name="atmospheric_pressure_measurement_errors", length = 10)
-    private Double atmosphericPressureMeasurementErrors;
-
-    @Column(name="solar_radiation_measurement_errors", length = 10)
-    private Double solarRadiationMeasurementErrors;
-
-    @Column(name="wind_measurement_errors", length = 10)
-    private Double windMeasurementErrors;
-
-
-
+//    @Column(name="air_temperature_measurement_errors", length = 36)
+//    private String airTemperatureMeasurementErrors;
+//
+//    @Column(name="air_humidity_measurement_errors", length = 36)
+//    private String airHumidityMeasurementErrors;
+//
+//    @Column(name="atmospheric_pressure_measurement_errors", length = 40)
+//    private String atmosphericPressureMeasurementErrors;
+//
+//    @Column(name="solar_radiation_measurement_errors", length = 40)
+//    private String solarRadiationMeasurementErrors;
+//
+//    @Column(name="wind_measurement_errors", length = 40)
+//    private String windMeasurementErrors;
 
 }
