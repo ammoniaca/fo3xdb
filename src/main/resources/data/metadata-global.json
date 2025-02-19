@@ -1,7 +1,7 @@
 {
   "latitude": 43.817758,
   "longitude": 11.201989,
-  "elevation": null,
+  "elevation": 55,
   "experiment": "Free air O3 eXposure",
   "time": "iso8601",
   "timezone": "Europe/Rome"

@@ -1,6 +1,7 @@
 package org.cnr.fo3xdb.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 

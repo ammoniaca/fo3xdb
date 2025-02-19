@@ -1,5 +1,7 @@
 package org.cnr.fo3xdb.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cnr.fo3xdb.dto.FoxGlobalMetadataDTO;
 import org.cnr.fo3xdb.dto.FoxHourlyMetadataDTO;
 import org.cnr.fo3xdb.dto.FoxHourlyRecordsDTO;
@@ -15,12 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class FoxHourlyService {
 
+    private static final String ZONE_EUROPE_ROME = "Europe/Rome";
     private final FoxGlobalMetadataRepository globalMetadataRepository;
     private final FoxHourlyMetadataRepository hourlyMetadataRepository;
     private final FoxHourlyRecordRepository recordRepository;
@@ -39,22 +46,36 @@ public class FoxHourlyService {
         this.mapper = mapper;
     }
 
-    public FoxHourlyResponseDTO retrieveRecordByIntervalData(){
-        // get data
+    public FoxHourlyResponseDTO retrieveRecordsByDateInterval(
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        // Get global metadata and map entity to DTO class
         Optional<FoxGlobalMetadataEntity> optionalGlobalMetadata = globalMetadataRepository.findById(1L);
-        Optional<FoxHourlyMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
-        // TODO
-        List<FoxHourlyRecordEntity> listRecords = recordRepository.findAll();
-
-        // map entity to DTO class
         FoxGlobalMetadataDTO foxGlobalMetadataDTO = optionalGlobalMetadata
                 .map(t -> mapper.map(t, FoxGlobalMetadataDTO.class))
-                .orElse(null);
-        // map entity to DTO class
+                .orElseThrow(null);
+
+        // Get hourly metadata and map entity to DTO class
+        Optional<FoxHourlyMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
         FoxHourlyMetadataDTO foxHourlyMetadataDTO = optionalHourlyMetadata
                 .map(t -> mapper.map(t, FoxHourlyMetadataDTO.class))
-                .orElse(null);
-        // populate class object
+                .orElseThrow(null);
+
+        OffsetDateTime odtStartDate = startDate
+                .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
+                .toOffsetDateTime();
+        OffsetDateTime odtEndDate = endDate
+                .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
+                .toOffsetDateTime();
+
+        // Get data
+        List<FoxHourlyRecordEntity> listRecords = recordRepository
+                .findAllByTimestampBetween(odtStartDate, odtEndDate);
+        if(listRecords.isEmpty()){
+            return null;
+        }
+
         FoxHourlyRecordsDTO foxHourlyRecords = convertRecordsToListDTO(listRecords);
 
         return FoxHourlyResponseDTO
@@ -68,14 +89,15 @@ public class FoxHourlyService {
                 .hourlyUnits(foxHourlyMetadataDTO)
                 .hourly(foxHourlyRecords)
                 .build();
-
     }
 
     private FoxHourlyRecordsDTO convertRecordsToListDTO(List<FoxHourlyRecordEntity> records){
         FoxHourlyRecordsDTO responseDTO = new FoxHourlyRecordsDTO();
         for(FoxHourlyRecordEntity record : records){
-            // timestamp
-            responseDTO.appendTimestamp(record.getTimestamp());
+            // timestamp in UTC "Europe/Rome"
+            OffsetDateTime timestamp = record.getTimestamp();
+            ZonedDateTime romeZonedDateTime = timestamp.atZoneSameInstant(ZoneId.of(ZONE_EUROPE_ROME));
+            responseDTO.appendTimestamp(romeZonedDateTime.toOffsetDateTime());
             // Rain (total, max)
             responseDTO.appendRainTotal(record.getRainTotal());
             responseDTO.appendRainIntensityMax(record.getRainIntensityMax());
@@ -101,6 +123,8 @@ public class FoxHourlyService {
             responseDTO.appendWindDirectionAtMaximumSpeed(record.getWindDirectionAtMaximumSpeed());
             // Evapotranspiration
             responseDTO.appendEvapotranspiration(record.getEvapotranspiration());
+            // Solar_Radiation_Calculated
+            responseDTO.appendSolarRadiationCalculated(record.getSolarRadiationCalculated());
             // Instrument (battery, data_logger)
             responseDTO.appendBatteryVoltage(record.getBatteryVoltage());
             responseDTO.appendDataLoggerTemperature(record.getDataLoggerTemperature());
