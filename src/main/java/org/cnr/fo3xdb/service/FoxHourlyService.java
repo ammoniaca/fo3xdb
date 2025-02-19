@@ -1,7 +1,5 @@
 package org.cnr.fo3xdb.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cnr.fo3xdb.dto.FoxGlobalMetadataDTO;
 import org.cnr.fo3xdb.dto.FoxHourlyMetadataDTO;
 import org.cnr.fo3xdb.dto.FoxHourlyRecordsDTO;
@@ -15,7 +13,6 @@ import org.cnr.fo3xdb.repository.FoxHourlyRecordRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;

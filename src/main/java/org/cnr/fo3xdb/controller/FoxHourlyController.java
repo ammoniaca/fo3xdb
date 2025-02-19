@@ -1,6 +1,5 @@
 package org.cnr.fo3xdb.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.cnr.fo3xdb.dto.FoxHourlyResponseDTO;
 import org.cnr.fo3xdb.service.FoxHourlyService;
 import org.springframework.beans.factory.annotation.Autowired;
