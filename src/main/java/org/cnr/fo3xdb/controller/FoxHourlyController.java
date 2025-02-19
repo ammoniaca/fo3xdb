@@ -40,16 +40,18 @@ public class FoxHourlyController {
     )
     public ResponseEntity<FoxHourlyResponseDTO> getRecords(
                 @RequestParam(value="start") LocalDate startDate,
-                @RequestParam(value="end") LocalDate endDate
-            ) {
-            FoxHourlyResponseDTO response = service
+                @RequestParam(value="end") LocalDate endDate) {
+        if(startDate.isAfter(endDate)) {
+            return null;
+        }
+        FoxHourlyResponseDTO response = service
                     .retrieveRecordsByDateInterval(
                             startDate,
                             endDate
                     );
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 
 }
