@@ -70,4 +70,5 @@ public class FoxHourlyMetadataDTO {
     @JsonProperty("dataLoggerTemperature")
     private String dataLoggerTemperature;
 
+
 }

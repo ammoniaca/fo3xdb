@@ -7,6 +7,9 @@ import org.cnr.fo3xdb.dto.FoxHourlyResponseDTO;
 import org.cnr.fo3xdb.entity.FoxGlobalMetadataEntity;
 import org.cnr.fo3xdb.entity.FoxHourlyMetadataEntity;
 import org.cnr.fo3xdb.entity.FoxHourlyRecordEntity;
+import org.cnr.fo3xdb.exceptions.GlobalMetadataTableException;
+import org.cnr.fo3xdb.exceptions.HourlyMetadataTableException;
+import org.cnr.fo3xdb.exceptions.RecordsNotFoundException;
 import org.cnr.fo3xdb.repository.FoxGlobalMetadataRepository;
 import org.cnr.fo3xdb.repository.FoxHourlyMetadataRepository;
 import org.cnr.fo3xdb.repository.FoxHourlyRecordRepository;
@@ -51,13 +54,17 @@ public class FoxHourlyService {
         Optional<FoxGlobalMetadataEntity> optionalGlobalMetadata = globalMetadataRepository.findById(1L);
         FoxGlobalMetadataDTO foxGlobalMetadataDTO = optionalGlobalMetadata
                 .map(t -> mapper.map(t, FoxGlobalMetadataDTO.class))
-                .orElseThrow(null);
+                .orElseThrow(
+                        () -> new GlobalMetadataTableException("Error retrieving global metadata in table.")
+                );
 
         // Get hourly metadata and map entity to DTO class
         Optional<FoxHourlyMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
         FoxHourlyMetadataDTO foxHourlyMetadataDTO = optionalHourlyMetadata
                 .map(t -> mapper.map(t, FoxHourlyMetadataDTO.class))
-                .orElseThrow(null);
+                .orElseThrow(
+                        () -> new HourlyMetadataTableException("Error retrieving hourly metadata in table.")
+                );
 
         OffsetDateTime odtStartDate = startDate
                 .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
@@ -70,7 +77,7 @@ public class FoxHourlyService {
         List<FoxHourlyRecordEntity> listRecords = recordRepository
                 .findAllByTimestampBetween(odtStartDate, odtEndDate);
         if(listRecords.isEmpty()){
-            return null;
+            throw new RecordsNotFoundException("Records not found.");
         }
 
         FoxHourlyRecordsDTO foxHourlyRecords = convertRecordsToListDTO(listRecords);
