@@ -46,7 +46,7 @@ public class FoxHourlyService {
         this.mapper = mapper;
     }
 
-    public FoxHourlyResponseDTO retrieveRecordsByDateInterval(
+    public FoxHourlyResponseDTO retrieveRecordsByDateRange(
             LocalDate startDate,
             LocalDate endDate
     ) {
