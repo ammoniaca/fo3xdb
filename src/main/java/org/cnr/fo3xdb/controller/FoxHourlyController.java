@@ -76,7 +76,7 @@ public class FoxHourlyController {
                 @RequestParam(value="end")
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
     {
-        // Check if date values are correct
+        // Check if date values are correct otherwise return an Exception
         dateChecker(startDate, endDate);
         // get data
         FoxHourlyResponseDTO response = service
@@ -87,21 +87,6 @@ public class FoxHourlyController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
-    }
-
-    @GetMapping(
-            value = "/records/csv",
-            produces = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public void getCSVRecords(
-            @RequestParam(value="start")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(value="end")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
-    {
-        dateChecker(startDate, endDate);
-
-
     }
 
     private void dateChecker(LocalDate startDate, LocalDate endDate) {
