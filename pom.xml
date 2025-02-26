@@ -79,6 +79,13 @@
 			<version>3.17.0</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.10</version>
+		</dependency>
+
 		<!-- to fix getter and setter lombok problem -->
 
 		<dependency>
