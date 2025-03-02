@@ -17,6 +17,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.cnr.fo3xdb.helper.CSVHelper;
+
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -48,8 +51,8 @@ public class FoxHourlyService {
 
     public FoxHourlyResponseDTO retrieveRecordsByDateRange(
             LocalDate startDate,
-            LocalDate endDate
-    ) {
+            LocalDate endDate)
+    {
         // Get global metadata and map entity to DTO class
         Optional<FoxGlobalMetadataEntity> optionalGlobalMetadata = globalMetadataRepository.findById(1L);
         FoxGlobalMetadataDTO foxGlobalMetadataDTO = optionalGlobalMetadata
@@ -94,6 +97,28 @@ public class FoxHourlyService {
                 .hourly(foxHourlyRecords)
                 .build();
     }
+
+    public ByteArrayInputStream downloadCSV(
+            LocalDate startDate,
+            LocalDate endDate)
+    {
+        OffsetDateTime odtStartDate = startDate
+                .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
+                .toOffsetDateTime();
+        OffsetDateTime odtEndDate = endDate
+                .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
+                .toOffsetDateTime();
+
+        // Get data
+        List<FoxHourlyRecordEntity> listRecords = recordRepository
+                .findAllByTimestampBetween(odtStartDate, odtEndDate);
+        if(listRecords.isEmpty()){
+            throw new RecordsNotFoundException("Records not found.");
+        }
+        return CSVHelper.recordsToCSV(listRecords);
+    }
+
+
 
     private FoxHourlyRecordsDTO convertRecordsToListDTO(List<FoxHourlyRecordEntity> records){
         FoxHourlyRecordsDTO responseDTO = new FoxHourlyRecordsDTO();

@@ -11,7 +11,10 @@ import org.cnr.fo3xdb.exceptions.DateRangeNotValidException;
 import org.cnr.fo3xdb.exceptions.ErrorResponseDTO;
 import org.cnr.fo3xdb.service.FoxHourlyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +50,7 @@ public class FoxHourlyController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Successfully retrieved"
+                    description = "Successfully returns JSON (JavaScript Object Notation) format."
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -70,7 +73,7 @@ public class FoxHourlyController {
             value = "/records/json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxHourlyResponseDTO> getJsonRecords(
+    public ResponseEntity<FoxHourlyResponseDTO> getJSONRecords(
                 @RequestParam(value="start")
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                 @RequestParam(value="end")
@@ -87,6 +90,57 @@ public class FoxHourlyController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
+    }
+
+    @Operation(
+            summary = "Search for FO3X data given a specific date range.",
+            description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
+                    "exposure) data in a specific date range."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully returns CSV (comma-separated values) format."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @GetMapping(
+            value = "/records/csv",
+            produces = {"application/csv"}
+    )
+    public ResponseEntity<Resource> getCSVRecords(
+            @RequestParam(value="start")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value="end")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
+    {
+        dateChecker(startDate, endDate);
+        String outMessage = MessageFormat.format(
+                "attachment; filename= FO3X_{0}_{1}.csv",
+                startDate.toString(), endDate.toString()
+        );
+
+        InputStreamResource file = new InputStreamResource(service.downloadCSV(startDate, endDate));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, outMessage)
+                .contentType(MediaType.parseMediaType("application/csv"))
+                .body(file);
     }
 
     private void dateChecker(LocalDate startDate, LocalDate endDate) {
