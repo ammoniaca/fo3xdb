@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.cnr.fo3xdb.dto.FoxHourlyMetadataDTO;
 import org.cnr.fo3xdb.dto.FoxHourlyResponseDTO;
 import org.cnr.fo3xdb.enums.CSVNoDataType;
 import org.cnr.fo3xdb.exceptions.DateRangeNotValidException;
@@ -29,18 +30,46 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 @RestController
-@RequestMapping("/api/v1/fox")
+@RequestMapping("/api/v1/fo3x")
 @Tag(name = "FO3X APIs")
 public class FoxHourlyController {
 
-    private static final int LOWER_DAYS_BOUND = 0;
-    private static final int UPPER_DAYS_BOUND = 180;
     private final FoxHourlyService service;
 
     @Autowired
     public FoxHourlyController(FoxHourlyService service) {
 
         this.service = service;
+    }
+
+    @Operation(
+            summary = "Find FO3X data measurement units.",
+            description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
+                    "exposure) data measurement units in SI (International System of Units)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully returns JSON (JavaScript Object Notation) format."
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @GetMapping(
+            value = "/records/measurement-units",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<FoxHourlyMetadataDTO> getFoxHourlyMetadata(){
+        FoxHourlyMetadataDTO foxHourlyMetadataDTO = service.getHourly();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(foxHourlyMetadataDTO);
     }
 
     @Operation(
@@ -80,8 +109,6 @@ public class FoxHourlyController {
                 @RequestParam(value="end")
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
     {
-        // Check if date values are correct otherwise return an Exception
-        dateChecker(startDate, endDate);
         // get data
         FoxHourlyResponseDTO response = service
                     .retrieveRecordsByDateRange(
@@ -131,7 +158,6 @@ public class FoxHourlyController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(value = "nodata") CSVNoDataType noData)
     {
-        dateChecker(startDate, endDate);
         String outMessage = MessageFormat.format(
                 "attachment; filename=FO3X_{0}_{1}.csv",
                 startDate.toString(), endDate.toString()
@@ -146,20 +172,4 @@ public class FoxHourlyController {
                 .contentType(MediaType.parseMediaType("application/csv"))
                 .body(file);
     }
-
-    private void dateChecker(LocalDate startDate, LocalDate endDate) {
-        long flagDays = ChronoUnit.DAYS.between(startDate, endDate);
-        if(!(LOWER_DAYS_BOUND < flagDays && flagDays < UPPER_DAYS_BOUND)){
-            String errorMessage = MessageFormat.format(
-                    "The date range between start date {0} and end date {1} cannot more of {2} days.",
-                    startDate, endDate, UPPER_DAYS_BOUND);
-            if(flagDays <= LOWER_DAYS_BOUND) {
-                errorMessage = MessageFormat.format(
-                        "The start date {0} cannot be equal to or less than the end date {1}.",
-                        startDate, endDate);
-            }
-            throw new DateRangeNotValidException(errorMessage);
-        }
-    }
-
 }

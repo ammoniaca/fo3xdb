@@ -8,6 +8,7 @@ import org.cnr.fo3xdb.entity.FoxGlobalMetadataEntity;
 import org.cnr.fo3xdb.entity.FoxHourlyMetadataEntity;
 import org.cnr.fo3xdb.entity.FoxHourlyRecordEntity;
 import org.cnr.fo3xdb.enums.CSVNoDataType;
+import org.cnr.fo3xdb.exceptions.DateRangeNotValidException;
 import org.cnr.fo3xdb.exceptions.GlobalMetadataTableException;
 import org.cnr.fo3xdb.exceptions.HourlyMetadataTableException;
 import org.cnr.fo3xdb.exceptions.RecordsNotFoundException;
@@ -21,10 +22,12 @@ import org.springframework.stereotype.Service;
 import org.cnr.fo3xdb.helper.CSVHelper;
 
 import java.io.ByteArrayInputStream;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +35,8 @@ import java.util.Optional;
 public class FoxHourlyService {
 
     private static final String ZONE_EUROPE_ROME = "Europe/Rome";
+    private static final int LOWER_DAYS_BOUND = 0;
+    private static final int UPPER_DAYS_BOUND = 180;
     private final FoxGlobalMetadataRepository globalMetadataRepository;
     private final FoxHourlyMetadataRepository hourlyMetadataRepository;
     private final FoxHourlyRecordRepository recordRepository;
@@ -50,10 +55,22 @@ public class FoxHourlyService {
         this.mapper = mapper;
     }
 
+    public FoxHourlyMetadataDTO getHourly(){
+        Optional<FoxHourlyMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
+        return optionalHourlyMetadata
+                .map(t -> mapper.map(t, FoxHourlyMetadataDTO.class))
+                .orElseThrow(
+                        () -> new HourlyMetadataTableException("Error retrieving hourly metadata in table.")
+                );
+    }
+
     public FoxHourlyResponseDTO retrieveRecordsByDateRange(
             LocalDate startDate,
             LocalDate endDate)
     {
+        // Check if date values are correct otherwise return an Exception
+        dateChecker(startDate, endDate);
+
         // Get global metadata and map entity to DTO class
         Optional<FoxGlobalMetadataEntity> optionalGlobalMetadata = globalMetadataRepository.findById(1L);
         FoxGlobalMetadataDTO foxGlobalMetadataDTO = optionalGlobalMetadata
@@ -104,6 +121,9 @@ public class FoxHourlyService {
             LocalDate endDate,
             CSVNoDataType noData)
     {
+        // Check if date values are correct otherwise return an Exception
+        dateChecker(startDate, endDate);
+
         OffsetDateTime odtStartDate = startDate
                 .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
                 .toOffsetDateTime();
@@ -122,8 +142,6 @@ public class FoxHourlyService {
                 noData
         );
     }
-
-
 
     private FoxHourlyRecordsDTO convertRecordsToListDTO(List<FoxHourlyRecordEntity> records){
         FoxHourlyRecordsDTO responseDTO = new FoxHourlyRecordsDTO();
@@ -170,5 +188,20 @@ public class FoxHourlyService {
             responseDTO.appendWindMeasurementErrors(record.getWindMeasurementErrors());
         }
         return responseDTO;
+    }
+
+    private void dateChecker(LocalDate startDate, LocalDate endDate) {
+        long flagDays = ChronoUnit.DAYS.between(startDate, endDate);
+        if(!(LOWER_DAYS_BOUND < flagDays && flagDays < UPPER_DAYS_BOUND)){
+            String errorMessage = MessageFormat.format(
+                    "The date range between start date {0} and end date {1} cannot more of {2} days.",
+                    startDate, endDate, UPPER_DAYS_BOUND);
+            if(flagDays <= LOWER_DAYS_BOUND) {
+                errorMessage = MessageFormat.format(
+                        "The start date {0} cannot be equal to or less than the end date {1}.",
+                        startDate, endDate);
+            }
+            throw new DateRangeNotValidException(errorMessage);
+        }
     }
 }
