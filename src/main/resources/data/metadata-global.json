@@ -4,6 +4,7 @@
   "elevation": 55,
   "experiment": "Free air O3 eXposure",
   "time": "iso8601",
-  "timezone": "Europe/Rome"
+  "timezone": "Europe/Rome",
+  "systemOfUnits": "International System of Units"
 }
 

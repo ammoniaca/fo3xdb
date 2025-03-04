@@ -28,6 +28,9 @@ public class FoxGlobalMetadataDTO {
     @JsonProperty("timezone")
     private String timezone;
 
+    @JsonProperty("systemOfUnits")
+    private String systemOfUnits;
+
 //    //"timezone_abbreviation": "GMT+1"
 //    @JsonProperty("timezoneAbbreviation")
 //    private String timezoneAbbreviation;

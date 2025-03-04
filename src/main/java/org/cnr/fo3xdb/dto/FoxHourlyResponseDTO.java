@@ -28,10 +28,15 @@ public class FoxHourlyResponseDTO {
     @JsonProperty("timezone")
     private String timezone;
 
+    @JsonProperty("systemOfUnits")
+    private String systemOfUnits;
+
     @JsonProperty("hourlyUnits")
     private FoxHourlyMetadataDTO hourlyUnits;
 
     @JsonProperty("hourly")
     public FoxHourlyRecordsDTO hourly;
+
+
 
 }

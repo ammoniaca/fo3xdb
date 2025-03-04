@@ -111,6 +111,7 @@ public class FoxHourlyService {
                 .experiment(foxGlobalMetadataDTO.getExperiment())
                 .time(foxGlobalMetadataDTO.getTime())
                 .timezone(foxGlobalMetadataDTO.getTimezone())
+                .systemOfUnits(foxGlobalMetadataDTO.getSystemOfUnits())
                 .hourlyUnits(foxHourlyMetadataDTO)
                 .hourly(foxHourlyRecords)
                 .build();

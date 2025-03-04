@@ -43,4 +43,7 @@ public class FoxGlobalMetadataEntity {
     @Column(name="experiment", length = 30)
     private String experiment;
 
+    @Column(name="system_of_units", length = 30)
+    private String systemOfUnits;
+
 }
