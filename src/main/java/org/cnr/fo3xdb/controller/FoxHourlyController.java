@@ -50,7 +50,7 @@ public class FoxHourlyController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Successfully returns JSON (JavaScript Object Notation) format."
+                    description = "Successfully returns."
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -75,12 +75,12 @@ public class FoxHourlyController {
     @Operation(
             summary = "Search for FO3X data given a specific date range.",
             description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
-                    "exposure) data in a specific date range."
+                    "exposure) data in a specific date range and produce a JSON (JavaScript Object Notation) format."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Successfully returns JSON (JavaScript Object Notation) format."
+                    description = "Successfully returns a JSON (JavaScript Object Notation) file format."
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -93,6 +93,14 @@ public class FoxHourlyController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
@@ -123,12 +131,12 @@ public class FoxHourlyController {
     @Operation(
             summary = "Search for FO3X data given a specific date range.",
             description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
-                    "exposure) data in a specific date range."
+                    "exposure) data in a specific date range and produce a CSV (comma-separated values) file format."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Successfully returns CSV (comma-separated values) format."
+                    description = "Successfully returns a CSV (comma-separated values) file format."
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -141,6 +149,14 @@ public class FoxHourlyController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
