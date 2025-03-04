@@ -7,6 +7,7 @@ import org.cnr.fo3xdb.dto.FoxHourlyResponseDTO;
 import org.cnr.fo3xdb.entity.FoxGlobalMetadataEntity;
 import org.cnr.fo3xdb.entity.FoxHourlyMetadataEntity;
 import org.cnr.fo3xdb.entity.FoxHourlyRecordEntity;
+import org.cnr.fo3xdb.enums.CSVNoDataType;
 import org.cnr.fo3xdb.exceptions.GlobalMetadataTableException;
 import org.cnr.fo3xdb.exceptions.HourlyMetadataTableException;
 import org.cnr.fo3xdb.exceptions.RecordsNotFoundException;
@@ -100,7 +101,8 @@ public class FoxHourlyService {
 
     public ByteArrayInputStream downloadCSV(
             LocalDate startDate,
-            LocalDate endDate)
+            LocalDate endDate,
+            CSVNoDataType noData)
     {
         OffsetDateTime odtStartDate = startDate
                 .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
@@ -115,7 +117,10 @@ public class FoxHourlyService {
         if(listRecords.isEmpty()){
             throw new RecordsNotFoundException("Records not found.");
         }
-        return CSVHelper.recordsToCSV(listRecords);
+        return CSVHelper.recordsToCSV(
+                listRecords,
+                noData
+        );
     }
 
 

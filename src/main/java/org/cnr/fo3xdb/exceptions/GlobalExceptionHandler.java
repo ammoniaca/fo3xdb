@@ -112,11 +112,31 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
+    @ExceptionHandler(CSVProducerException.class)
+    public ResponseEntity<ErrorResponseDTO> handlerCSVProducerException(
+            CSVProducerException ex,
+            WebRequest request)
+    {
+        ErrorResponseDTO error = ErrorResponseDTO
+                .builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .details(ex.getMessage())
+                .message(HttpStatus.INTERNAL_SERVER_ERROR.name())
+                .instance(getPath(request))
+                .build();
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(error);
+    }
+
     private String getPath(WebRequest request){
         return request
                 .getDescription(false)
                 .replace("uri=", "");
     }
+
 
 
 

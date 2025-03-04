@@ -3,20 +3,24 @@ package org.cnr.fo3xdb.helper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.cnr.fo3xdb.entity.FoxHourlyRecordEntity;
+import org.cnr.fo3xdb.enums.CSVNoDataType;
 import org.cnr.fo3xdb.enums.HeaderFo3xCSVLabels;
+import org.cnr.fo3xdb.exceptions.CSVProducerException;
 
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
 public class CSVHelper {
 
     public static ByteArrayInputStream recordsToCSV(
-            List<FoxHourlyRecordEntity> listRecords
+            List<FoxHourlyRecordEntity> listRecords,
+            CSVNoDataType noData
     ) {
         final CSVFormat format = CSVFormat
                 .Builder
@@ -62,37 +66,44 @@ public class CSVHelper {
                 List<String> data = Arrays.asList(
                         String.valueOf(record.getId()),
                         record.getTimestamp().toString(),
-                        record.getRainTotal().toString(),
-                        record.getRainIntensityMax().toString(),
-                        record.getAirTemperatureMin().toString(),
-                        record.getAirTemperatureMax().toString(),
-                        record.getAirTemperatureAvg().toString(),
-                        record.getAirHumidityAvg().toString(),
-                        record.getDewPoint().toString(),
-                        record.getAirPressureAvg().toString(),
-                        record.getSolarRadiationMin().toString(),
-                        record.getSolarRadiationMax().toString(),
-                        record.getSolarRadiationAvg().toString(),
-                        record.getSolarRadiationCalculated().toString(),
-                        record.getWindSpeedMax().toString(),
-                        record.getWindSpeedAvg().toString(),
-                        record.getWindDirectionAvg().toString(),
-                        record.getWindDirectionSTD().toString(),
-                        record.getWindDirectionAtMaximumSpeed().toString(),
-                        record.getEvapotranspiration().toString(),
-                        record.getBatteryVoltage().toString(),
-                        record.getDataLoggerTemperature().toString(),
-                        record.getAirTemperatureMeasurementErrors().toString(),
-                        record.getAtmosphericPressureMeasurementErrors().toString(),
-                        record.getSolarRadiationMeasurementErrors().toString(),
-                        record.getWindMeasurementErrors().toString()
+                        safetyDoubleToString(record.getRainTotal(), noData),
+                        safetyDoubleToString(record.getRainIntensityMax(), noData),
+                        safetyDoubleToString(record.getRainIntensityMax(), noData),
+                        safetyDoubleToString(record.getAirTemperatureMin(), noData),
+                        safetyDoubleToString(record.getAirTemperatureMax(), noData),
+                        safetyDoubleToString(record.getAirTemperatureAvg(), noData),
+                        safetyDoubleToString(record.getAirHumidityAvg(), noData),
+                        safetyDoubleToString(record.getDewPoint(), noData),
+                        safetyDoubleToString(record.getAirPressureAvg(), noData),
+                        safetyDoubleToString(record.getSolarRadiationMin(), noData),
+                        safetyDoubleToString(record.getSolarRadiationMax(), noData),
+                        safetyDoubleToString(record.getSolarRadiationAvg(), noData),
+                        safetyDoubleToString(record.getSolarRadiationCalculated(), noData),
+                        safetyDoubleToString(record.getWindSpeedMax(), noData),
+                        safetyDoubleToString(record.getWindSpeedAvg(),noData),
+                        safetyDoubleToString(record.getWindDirectionAvg(), noData),
+                        safetyDoubleToString(record.getWindDirectionSTD(), noData),
+                        safetyDoubleToString(record.getWindDirectionAtMaximumSpeed(), noData),
+                        safetyDoubleToString(record.getEvapotranspiration(), noData),
+                        safetyDoubleToString(record.getBatteryVoltage(), noData),
+                        safetyDoubleToString(record.getDataLoggerTemperature(), noData),
+                        safetyDoubleToString(record.getAirTemperatureMeasurementErrors(), noData),
+                        safetyDoubleToString(record.getAtmosphericPressureMeasurementErrors(), noData),
+                        safetyDoubleToString(record.getSolarRadiationMeasurementErrors(), noData),
+                        safetyDoubleToString(record.getWindMeasurementErrors(), noData)
                 );
                 csvPrinter.printRecord(data);
             }
             csvPrinter.flush();
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
-            throw new RuntimeException("fail to import data to CSV file: " + e.getMessage());
+            String errorMessage = MessageFormat.format("CSV: {0}", e.getMessage());
+            throw new CSVProducerException(errorMessage);
         }
     }
+
+    private static String safetyDoubleToString(Double value, CSVNoDataType noData) {
+        return value == null ? noData.toString() : value.toString();
+    }
+
 }

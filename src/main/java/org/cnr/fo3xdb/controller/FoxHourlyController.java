@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.cnr.fo3xdb.dto.FoxHourlyResponseDTO;
+import org.cnr.fo3xdb.enums.CSVNoDataType;
 import org.cnr.fo3xdb.exceptions.DateRangeNotValidException;
 import org.cnr.fo3xdb.exceptions.ErrorResponseDTO;
 import org.cnr.fo3xdb.service.FoxHourlyService;
@@ -127,15 +128,18 @@ public class FoxHourlyController {
             @RequestParam(value="start")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value="end")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(value = "nodata") CSVNoDataType noData)
     {
         dateChecker(startDate, endDate);
         String outMessage = MessageFormat.format(
-                "attachment; filename= FO3X_{0}_{1}.csv",
+                "attachment; filename=FO3X_{0}_{1}.csv",
                 startDate.toString(), endDate.toString()
         );
 
-        InputStreamResource file = new InputStreamResource(service.downloadCSV(startDate, endDate));
+        InputStreamResource file = new InputStreamResource(
+                service.downloadCSV(startDate, endDate, noData)
+        );
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, outMessage)
