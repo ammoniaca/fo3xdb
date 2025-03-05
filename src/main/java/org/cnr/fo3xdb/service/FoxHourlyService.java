@@ -136,7 +136,9 @@ public class FoxHourlyService {
         List<FoxHourlyRecordEntity> listRecords = recordRepository
                 .findAllByTimestampBetween(odtStartDate, odtEndDate);
         if(listRecords.isEmpty()){
-            throw new RecordsNotFoundException("Records not found.");
+            String errorMessage = MessageFormat.format(
+                    "Records not found from {0} to {1}.", startDate, endDate);
+            throw new RecordsNotFoundException(errorMessage);
         }
         return CSVHelper.recordsToCSV(
                 listRecords,
@@ -144,7 +146,9 @@ public class FoxHourlyService {
         );
     }
 
-    private FoxHourlyRecordsDTO convertRecordsToListDTO(List<FoxHourlyRecordEntity> records){
+    private FoxHourlyRecordsDTO convertRecordsToListDTO(
+            List<FoxHourlyRecordEntity> records)
+    {
         FoxHourlyRecordsDTO responseDTO = new FoxHourlyRecordsDTO();
         for(FoxHourlyRecordEntity record : records){
             // timestamp in UTC "Europe/Rome"
