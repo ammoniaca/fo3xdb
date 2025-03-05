@@ -2,7 +2,7 @@ package org.cnr.fo3xdb.loader;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cnr.fo3xdb.entity.FoxHourlyMetadataEntity;
+import org.cnr.fo3xdb.entity.FoxHourlyWeatherMetadataEntity;
 import org.cnr.fo3xdb.repository.FoxHourlyMetadataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class RunJsonHourlyMetadataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if(repository.count() == 0){
             try(InputStream inputStream = TypeReference.class.getResourceAsStream("/data/metadata-hourly.json")) {
-                FoxHourlyMetadataEntity metadata = objectMapper.readValue(inputStream, FoxHourlyMetadataEntity.class);
+                FoxHourlyWeatherMetadataEntity metadata = objectMapper.readValue(inputStream, FoxHourlyWeatherMetadataEntity.class);
                 log.info("Reading hourly metadata from JSON data and saving to in-memory collection.");
                 repository.save(metadata);
             } catch (IOException ex) {

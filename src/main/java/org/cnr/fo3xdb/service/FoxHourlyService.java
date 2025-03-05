@@ -1,12 +1,12 @@
 package org.cnr.fo3xdb.service;
 
 import org.cnr.fo3xdb.dto.FoxGlobalMetadataDTO;
-import org.cnr.fo3xdb.dto.FoxHourlyMetadataDTO;
-import org.cnr.fo3xdb.dto.FoxHourlyRecordsDTO;
-import org.cnr.fo3xdb.dto.FoxHourlyResponseDTO;
+import org.cnr.fo3xdb.dto.FoxHourlyWeatherMetadataDTO;
+import org.cnr.fo3xdb.dto.FoxHourlyWeatherRecordsDTO;
+import org.cnr.fo3xdb.dto.FoxHourlyWeatherResponseDTO;
 import org.cnr.fo3xdb.entity.FoxGlobalMetadataEntity;
-import org.cnr.fo3xdb.entity.FoxHourlyMetadataEntity;
-import org.cnr.fo3xdb.entity.FoxHourlyRecordEntity;
+import org.cnr.fo3xdb.entity.FoxHourlyWeatherMetadataEntity;
+import org.cnr.fo3xdb.entity.FoxHourlyWeatherRecordEntity;
 import org.cnr.fo3xdb.enums.CSVNoDataType;
 import org.cnr.fo3xdb.exceptions.DateRangeNotValidException;
 import org.cnr.fo3xdb.exceptions.GlobalMetadataTableException;
@@ -55,16 +55,16 @@ public class FoxHourlyService {
         this.mapper = mapper;
     }
 
-    public FoxHourlyMetadataDTO getHourly(){
-        Optional<FoxHourlyMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
+    public FoxHourlyWeatherMetadataDTO getHourly(){
+        Optional<FoxHourlyWeatherMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
         return optionalHourlyMetadata
-                .map(t -> mapper.map(t, FoxHourlyMetadataDTO.class))
+                .map(t -> mapper.map(t, FoxHourlyWeatherMetadataDTO.class))
                 .orElseThrow(
                         () -> new HourlyMetadataTableException("Error retrieving hourly metadata in table.")
                 );
     }
 
-    public FoxHourlyResponseDTO retrieveRecordsByDateRange(
+    public FoxHourlyWeatherResponseDTO retrieveRecordsByDateRange(
             LocalDate startDate,
             LocalDate endDate)
     {
@@ -80,9 +80,9 @@ public class FoxHourlyService {
                 );
 
         // Get hourly metadata and map entity to DTO class
-        Optional<FoxHourlyMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
-        FoxHourlyMetadataDTO foxHourlyMetadataDTO = optionalHourlyMetadata
-                .map(t -> mapper.map(t, FoxHourlyMetadataDTO.class))
+        Optional<FoxHourlyWeatherMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
+        FoxHourlyWeatherMetadataDTO foxHourlyWeatherMetadataDTO = optionalHourlyMetadata
+                .map(t -> mapper.map(t, FoxHourlyWeatherMetadataDTO.class))
                 .orElseThrow(
                         () -> new HourlyMetadataTableException("Error retrieving hourly metadata in table.")
                 );
@@ -95,15 +95,15 @@ public class FoxHourlyService {
                 .toOffsetDateTime();
 
         // Get data
-        List<FoxHourlyRecordEntity> listRecords = recordRepository
+        List<FoxHourlyWeatherRecordEntity> listRecords = recordRepository
                 .findAllByTimestampBetween(odtStartDate, odtEndDate);
         if(listRecords.isEmpty()){
             throw new RecordsNotFoundException("Records not found.");
         }
 
-        FoxHourlyRecordsDTO foxHourlyRecords = convertRecordsToListDTO(listRecords);
+        FoxHourlyWeatherRecordsDTO foxHourlyRecords = convertRecordsToListDTO(listRecords);
 
-        return FoxHourlyResponseDTO
+        return FoxHourlyWeatherResponseDTO
                 .builder()
                 .latitude(foxGlobalMetadataDTO.getLatitude())
                 .longitude(foxGlobalMetadataDTO.getLongitude())
@@ -112,7 +112,7 @@ public class FoxHourlyService {
                 .time(foxGlobalMetadataDTO.getTime())
                 .timezone(foxGlobalMetadataDTO.getTimezone())
                 .systemOfUnits(foxGlobalMetadataDTO.getSystemOfUnits())
-                .hourlyUnits(foxHourlyMetadataDTO)
+                .hourlyUnits(foxHourlyWeatherMetadataDTO)
                 .hourly(foxHourlyRecords)
                 .build();
     }
@@ -133,7 +133,7 @@ public class FoxHourlyService {
                 .toOffsetDateTime();
 
         // Get data
-        List<FoxHourlyRecordEntity> listRecords = recordRepository
+        List<FoxHourlyWeatherRecordEntity> listRecords = recordRepository
                 .findAllByTimestampBetween(odtStartDate, odtEndDate);
         if(listRecords.isEmpty()){
             String errorMessage = MessageFormat.format(
@@ -146,11 +146,11 @@ public class FoxHourlyService {
         );
     }
 
-    private FoxHourlyRecordsDTO convertRecordsToListDTO(
-            List<FoxHourlyRecordEntity> records)
+    private FoxHourlyWeatherRecordsDTO convertRecordsToListDTO(
+            List<FoxHourlyWeatherRecordEntity> records)
     {
-        FoxHourlyRecordsDTO responseDTO = new FoxHourlyRecordsDTO();
-        for(FoxHourlyRecordEntity record : records){
+        FoxHourlyWeatherRecordsDTO responseDTO = new FoxHourlyWeatherRecordsDTO();
+        for(FoxHourlyWeatherRecordEntity record : records){
             // timestamp in UTC "Europe/Rome"
             OffsetDateTime timestamp = record.getTimestamp();
             ZonedDateTime romeZonedDateTime = timestamp.atZoneSameInstant(ZoneId.of(ZONE_EUROPE_ROME));

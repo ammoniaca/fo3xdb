@@ -2,7 +2,7 @@ package org.cnr.fo3xdb.helper;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.cnr.fo3xdb.entity.FoxHourlyRecordEntity;
+import org.cnr.fo3xdb.entity.FoxHourlyWeatherRecordEntity;
 import org.cnr.fo3xdb.enums.CSVNoDataType;
 import org.cnr.fo3xdb.enums.HeaderFo3xCSVLabels;
 import org.cnr.fo3xdb.exceptions.CSVProducerException;
@@ -19,7 +19,7 @@ import java.util.List;
 public class CSVHelper {
 
     public static ByteArrayInputStream recordsToCSV(
-            List<FoxHourlyRecordEntity> listRecords,
+            List<FoxHourlyWeatherRecordEntity> listRecords,
             CSVNoDataType noData
     ) {
         final CSVFormat format = CSVFormat
@@ -62,7 +62,7 @@ public class CSVHelper {
             );
             csvPrinter.printRecord(header);
             // store data records
-            for(FoxHourlyRecordEntity record : listRecords) {
+            for(FoxHourlyWeatherRecordEntity record : listRecords) {
                 List<String> data = Arrays.asList(
                         String.valueOf(record.getId()),
                         record.getTimestamp().toString(),

@@ -1,8 +1,8 @@
 package org.cnr.fo3xdb.loader;
 
-import org.cnr.fo3xdb.entity.FoxHourlyRecordEntity;
+import org.cnr.fo3xdb.entity.FoxHourlyWeatherRecordEntity;
 
 import java.util.List;
 
-public record FoxRecords(List<FoxHourlyRecordEntity> records) {
+public record FoxRecords(List<FoxHourlyWeatherRecordEntity> records) {
 }

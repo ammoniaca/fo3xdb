@@ -1,10 +1,7 @@
 package org.cnr.fo3xdb.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 
 @Entity
@@ -14,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @Table(name = "fox_hourly_metadata")
-public class FoxHourlyMetadataEntity {
+public class FoxHourlyWeatherMetadataEntity {
 
     @Id
     @GeneratedValue(

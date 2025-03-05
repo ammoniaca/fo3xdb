@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FoxHourlyMetadataDTO {
+public class FoxHourlyWeatherMetadataDTO {
 
     @JsonProperty("rainTotal")
     private String rainTotal;

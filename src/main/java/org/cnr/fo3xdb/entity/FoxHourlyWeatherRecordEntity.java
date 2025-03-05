@@ -1,7 +1,6 @@
 package org.cnr.fo3xdb.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +16,7 @@ import java.time.ZonedDateTime;
 @Setter
 @Builder
 @Table(name = "fox_hourly")
-public class FoxHourlyRecordEntity {
+public class FoxHourlyWeatherRecordEntity {
 
     @Id
     @GeneratedValue(

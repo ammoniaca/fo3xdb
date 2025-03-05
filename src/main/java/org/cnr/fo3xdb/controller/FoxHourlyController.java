@@ -6,10 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.cnr.fo3xdb.dto.FoxHourlyMetadataDTO;
-import org.cnr.fo3xdb.dto.FoxHourlyResponseDTO;
+import org.cnr.fo3xdb.dto.FoxHourlyWeatherMetadataDTO;
+import org.cnr.fo3xdb.dto.FoxHourlyWeatherResponseDTO;
 import org.cnr.fo3xdb.enums.CSVNoDataType;
-import org.cnr.fo3xdb.exceptions.DateRangeNotValidException;
 import org.cnr.fo3xdb.exceptions.ErrorResponseDTO;
 import org.cnr.fo3xdb.service.FoxHourlyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("/api/v1/fo3x")
@@ -65,11 +63,11 @@ public class FoxHourlyController {
             value = "/records/measurement-units",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxHourlyMetadataDTO> getFoxHourlyMetadata(){
-        FoxHourlyMetadataDTO foxHourlyMetadataDTO = service.getHourly();
+    public ResponseEntity<FoxHourlyWeatherMetadataDTO> getFoxHourlyMetadata(){
+        FoxHourlyWeatherMetadataDTO foxHourlyWeatherMetadataDTO = service.getHourly();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(foxHourlyMetadataDTO);
+                .body(foxHourlyWeatherMetadataDTO);
     }
 
     @Operation(
@@ -111,14 +109,14 @@ public class FoxHourlyController {
             value = "/records/json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxHourlyResponseDTO> getJSONRecords(
+    public ResponseEntity<FoxHourlyWeatherResponseDTO> getJSONRecords(
                 @RequestParam(value="start")
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                 @RequestParam(value="end")
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
     {
         // get data
-        FoxHourlyResponseDTO response = service
+        FoxHourlyWeatherResponseDTO response = service
                     .retrieveRecordsByDateRange(
                             startDate,
                             endDate

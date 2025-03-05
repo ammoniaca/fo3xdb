@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Getter
@@ -13,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoxHourlyRecordsDTO {
+public class FoxHourlyWeatherRecordsDTO {
 
     @JsonProperty("timestamp")
     private List<OffsetDateTime> timestamp = new ArrayList<>();
