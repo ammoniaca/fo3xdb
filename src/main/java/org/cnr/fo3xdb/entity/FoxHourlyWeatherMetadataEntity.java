@@ -10,7 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@Table(name = "fox_hourly_metadata")
+@Table(name = "fox_weather_hourly_metadata")
 public class FoxHourlyWeatherMetadataEntity {
 
     @Id

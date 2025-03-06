@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 @Builder
-@Table(name = "fox_hourly")
+@Table(name = "fox_weather_hourly")
 public class FoxHourlyWeatherRecordEntity {
 
     @Id

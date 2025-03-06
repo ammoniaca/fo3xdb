@@ -10,7 +10,7 @@ import org.cnr.fo3xdb.dto.FoxHourlyWeatherMetadataDTO;
 import org.cnr.fo3xdb.dto.FoxHourlyWeatherResponseDTO;
 import org.cnr.fo3xdb.enums.CSVNoDataType;
 import org.cnr.fo3xdb.exceptions.ErrorResponseDTO;
-import org.cnr.fo3xdb.service.FoxHourlyService;
+import org.cnr.fo3xdb.service.FoxHourlyWeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -32,18 +32,18 @@ import java.time.LocalDate;
 @Tag(name = "FO3X APIs")
 public class FoxHourlyController {
 
-    private final FoxHourlyService service;
+    private final FoxHourlyWeatherService service;
 
     @Autowired
-    public FoxHourlyController(FoxHourlyService service) {
+    public FoxHourlyController(FoxHourlyWeatherService service) {
 
         this.service = service;
     }
 
     @Operation(
-            summary = "Find FO3X data measurement units.",
+            summary = "Find FO3X weather data measurement units.",
             description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
-                    "exposure) data measurement units in SI (International System of Units)."
+                    "exposure) weather data measurement units in SI (International System of Units)."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -60,7 +60,7 @@ public class FoxHourlyController {
             )}
     )
     @GetMapping(
-            value = "/records/measurement-units",
+            value = "/weather/measurement-units",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<FoxHourlyWeatherMetadataDTO> getFoxHourlyMetadata(){
@@ -71,9 +71,9 @@ public class FoxHourlyController {
     }
 
     @Operation(
-            summary = "Search for FO3X data given a specific date range.",
+            summary = "Search for FO3X weather data given a specific date range.",
             description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
-                    "exposure) data in a specific date range and produce a JSON (JavaScript Object Notation) format."
+                    "exposure) weather data in a specific date range and produce a JSON (JavaScript Object Notation) format."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -106,7 +106,7 @@ public class FoxHourlyController {
             )}
     )
     @GetMapping(
-            value = "/records/json",
+            value = "/weather/json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<FoxHourlyWeatherResponseDTO> getJSONRecords(
@@ -127,9 +127,9 @@ public class FoxHourlyController {
     }
 
     @Operation(
-            summary = "Search for FO3X data given a specific date range.",
+            summary = "Search for FO3X weather data given a specific date range.",
             description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
-                    "exposure) data in a specific date range and produce a CSV (comma-separated values) file format."
+                    "exposure) weather data in a specific date range and produce a CSV (comma-separated values) file format."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -162,7 +162,7 @@ public class FoxHourlyController {
             )}
     )
     @GetMapping(
-            value = "/records/csv",
+            value = "/weather/csv",
             produces = {"application/csv"}
     )
     public ResponseEntity<Resource> getCSVRecords(
