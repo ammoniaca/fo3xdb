@@ -2,7 +2,7 @@ package org.cnr.fo3xdb.loader;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cnr.fo3xdb.repository.FoxMinuteOzoneRecordRepository;
+import org.cnr.fo3xdb.repository.FoxOzoneRecordRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -15,10 +15,10 @@ import java.io.InputStream;
 public class RunJsonOzoneRecordLoader implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(RunJsonOzoneRecordLoader.class);
-    private final FoxMinuteOzoneRecordRepository repository;
+    private final FoxOzoneRecordRepository repository;
     private final ObjectMapper objectMapper;
 
-    public RunJsonOzoneRecordLoader(FoxMinuteOzoneRecordRepository repository, ObjectMapper objectMapper) {
+    public RunJsonOzoneRecordLoader(FoxOzoneRecordRepository repository, ObjectMapper objectMapper) {
         this.repository = repository;
         this.objectMapper = objectMapper;
     }

@@ -1,6 +1,5 @@
 package org.cnr.fo3xdb.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,8 +13,8 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 @Builder
-@Table(name = "fox_ozone_minute")
-public class FoxMinuteOzoneRecordEntity {
+@Table(name = "fox_ozone_records")
+public class FoxOzoneRecordEntity {
 
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
@@ -46,9 +45,6 @@ public class FoxMinuteOzoneRecordEntity {
     @Column(name="flow_level0", length = 50)
     private Double flowLevel0;
 
-    @Column(name="ozone_run_Level0_avg", length = 50)
-    private Double ozoneRunLevel0Avg;
-
     // level 1
 
     @Column(name="ozone_level1", length = 50)
@@ -63,9 +59,6 @@ public class FoxMinuteOzoneRecordEntity {
     @Column(name="flow_level1", length = 50)
     private Double flowLevel1;
 
-    @Column(name="ozone_run_level1_avg", length = 50)
-    private Double ozoneRunLevel1Avg;
-
     // level 2
 
     @Column(name="ozone_level2", length = 50)
@@ -79,9 +72,6 @@ public class FoxMinuteOzoneRecordEntity {
 
     @Column(name="flow_level2", length = 50)
     private Double flowLevel2;
-
-    @Column(name="ozone_run_level2_avg", length = 50)
-    private Double ozoneRunLevel2Avg;
 
     public void setTimestamp(OffsetDateTime timestamp) {
         ZonedDateTime romeZonedDateTime = timestamp.atZoneSameInstant(ZoneId.of(ZONE_ID));

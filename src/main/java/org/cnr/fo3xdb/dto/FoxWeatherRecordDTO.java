@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoxHourlyWeatherRecordDTO {
+public class FoxWeatherRecordDTO {
 
     @JsonProperty("timestamp")
     private OffsetDateTime timestamp;

@@ -1,6 +1,6 @@
 package org.cnr.fo3xdb.enums;
 
-public enum HeaderFo3xCSVLabels {
+public enum HeaderFoxWeatherCSVLabels {
 
     ID("id"),
     TIMESTAMP("timestamp"),
@@ -32,11 +32,13 @@ public enum HeaderFo3xCSVLabels {
 
     private final String label;
 
-    HeaderFo3xCSVLabels(String label) {
+    HeaderFoxWeatherCSVLabels(String label) {
+
         this.label = label;
     }
 
     public String getLabel() {
+
         return label;
     }
 

@@ -6,11 +6,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.cnr.fo3xdb.dto.FoxHourlyWeatherMetadataDTO;
-import org.cnr.fo3xdb.dto.FoxHourlyWeatherResponseDTO;
+import org.cnr.fo3xdb.dto.FoxOzoneUnitsDTO;
+import org.cnr.fo3xdb.dto.FoxWeatherUnitsDTO;
+import org.cnr.fo3xdb.dto.FoxWeatherResponseDTO;
 import org.cnr.fo3xdb.enums.CSVNoDataType;
+import org.cnr.fo3xdb.enums.OzoneTimeUnit;
 import org.cnr.fo3xdb.exceptions.ErrorResponseDTO;
-import org.cnr.fo3xdb.service.FoxHourlyWeatherService;
+import org.cnr.fo3xdb.service.FoxOzoneService;
+import org.cnr.fo3xdb.service.FoxWeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -30,15 +33,21 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/api/v1/fo3x")
 @Tag(name = "FO3X APIs")
-public class FoxHourlyController {
+public class FoxController {
 
-    private final FoxHourlyWeatherService service;
+    private final FoxWeatherService weatherService;
+    private final FoxOzoneService ozoneService;
 
     @Autowired
-    public FoxHourlyController(FoxHourlyWeatherService service) {
-
-        this.service = service;
+    public FoxController(
+            FoxWeatherService weatherService,
+            FoxOzoneService ozoneService)
+    {
+        this.weatherService = weatherService;
+        this.ozoneService = ozoneService;
     }
+
+    // WEATHER
 
     @Operation(
             summary = "Find FO3X weather data measurement units.",
@@ -63,11 +72,11 @@ public class FoxHourlyController {
             value = "/weather/measurement-units",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxHourlyWeatherMetadataDTO> getFoxHourlyMetadata(){
-        FoxHourlyWeatherMetadataDTO foxHourlyWeatherMetadataDTO = service.getHourly();
+    public ResponseEntity<FoxWeatherUnitsDTO> getFoxWeatherUnits(){
+        FoxWeatherUnitsDTO foxWeatherUnitsDTO = weatherService.getWeatherUnits();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(foxHourlyWeatherMetadataDTO);
+                .body(foxWeatherUnitsDTO);
     }
 
     @Operation(
@@ -109,15 +118,15 @@ public class FoxHourlyController {
             value = "/weather/json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxHourlyWeatherResponseDTO> getJSONRecords(
+    public ResponseEntity<FoxWeatherResponseDTO> getJSONRecords(
                 @RequestParam(value="start")
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                 @RequestParam(value="end")
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
     {
         // get data
-        FoxHourlyWeatherResponseDTO response = service
-                    .retrieveRecordsByDateRange(
+        FoxWeatherResponseDTO response = weatherService
+                    .retrieveWeatherRecordsByDateRange(
                             startDate,
                             endDate
                     );
@@ -178,7 +187,7 @@ public class FoxHourlyController {
         );
 
         InputStreamResource file = new InputStreamResource(
-                service.downloadCSV(startDate, endDate, noData)
+                weatherService.downloadCSV(startDate, endDate, noData)
         );
 
         return ResponseEntity.ok()
@@ -186,4 +195,19 @@ public class FoxHourlyController {
                 .contentType(MediaType.parseMediaType("application/csv"))
                 .body(file);
     }
+
+    // OZONE
+    @GetMapping(
+            value = "/ozone/measurement-units",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<FoxOzoneUnitsDTO> getFoxOzoneUnits(
+            @RequestParam(value="time") OzoneTimeUnit timeUnit
+            ){
+        FoxOzoneUnitsDTO foxOzoneUnitsDTO = ozoneService.getOzoneUnits(timeUnit);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(foxOzoneUnitsDTO);
+    }
+
 }

@@ -1,6 +1,6 @@
 package org.cnr.fo3xdb.repository;
 
-import org.cnr.fo3xdb.entity.FoxHourlyWeatherRecordEntity;
+import org.cnr.fo3xdb.entity.FoxWeatherRecordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,10 +8,10 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @Repository
-public interface FoxHourlyWeatherRecordRepository extends
-        JpaRepository<FoxHourlyWeatherRecordEntity, Long> {
+public interface FoxWeatherRecordRepository extends
+        JpaRepository<FoxWeatherRecordEntity, Long> {
 
-    List<FoxHourlyWeatherRecordEntity> findAllByTimestampBetween(
+    List<FoxWeatherRecordEntity> findAllByTimestampBetween(
             OffsetDateTime start,
             OffsetDateTime end
     );

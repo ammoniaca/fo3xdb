@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoxMinuteOzoneRecordDTO {
+public class FoxOzoneRecordDTO {
 
     @JsonProperty("timestamp")
     private OffsetDateTime timestamp;
@@ -32,9 +32,6 @@ public class FoxMinuteOzoneRecordDTO {
     @JsonProperty("flowLevel0")
     private Double flowLevel0;
 
-    @JsonProperty("ozoneRunLevel0Avg")
-    private Double ozoneRunLevel0Avg;
-
     // level 1
 
     @JsonProperty("ozoneLevel1")
@@ -49,9 +46,6 @@ public class FoxMinuteOzoneRecordDTO {
     @JsonProperty("flowLevel1")
     private Double flowLevel1;
 
-    @JsonProperty("ozoneRunLevel1Avg")
-    private Double ozoneRunLevel1Avg;
-
     // level 2
 
     @JsonProperty("ozoneLevel2")
@@ -65,9 +59,5 @@ public class FoxMinuteOzoneRecordDTO {
 
     @JsonProperty("flowLevel2")
     private Double flowLevel2;
-
-    @JsonProperty("ozoneRunLevel2Avg")
-    private Double ozoneRunLevel2Avg;
-
 
 }

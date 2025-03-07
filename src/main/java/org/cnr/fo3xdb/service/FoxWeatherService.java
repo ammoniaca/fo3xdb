@@ -1,20 +1,17 @@
 package org.cnr.fo3xdb.service;
 
 import org.cnr.fo3xdb.dto.FoxGlobalMetadataDTO;
-import org.cnr.fo3xdb.dto.FoxHourlyWeatherMetadataDTO;
-import org.cnr.fo3xdb.dto.FoxHourlyWeatherRecordsDTO;
-import org.cnr.fo3xdb.dto.FoxHourlyWeatherResponseDTO;
-import org.cnr.fo3xdb.entity.FoxGlobalMetadataEntity;
-import org.cnr.fo3xdb.entity.FoxHourlyWeatherMetadataEntity;
-import org.cnr.fo3xdb.entity.FoxHourlyWeatherRecordEntity;
+import org.cnr.fo3xdb.dto.FoxWeatherUnitsDTO;
+import org.cnr.fo3xdb.dto.FoxWeatherRecordsDTO;
+import org.cnr.fo3xdb.dto.FoxWeatherResponseDTO;
+import org.cnr.fo3xdb.entity.FoxWeatherUnitsEntity;
+import org.cnr.fo3xdb.entity.FoxWeatherRecordEntity;
 import org.cnr.fo3xdb.enums.CSVNoDataType;
-import org.cnr.fo3xdb.exceptions.DateRangeNotValidException;
-import org.cnr.fo3xdb.exceptions.GlobalMetadataTableException;
-import org.cnr.fo3xdb.exceptions.HourlyMetadataTableException;
+import org.cnr.fo3xdb.exceptions.UnitsTableException;
 import org.cnr.fo3xdb.exceptions.RecordsNotFoundException;
 import org.cnr.fo3xdb.repository.FoxGlobalMetadataRepository;
-import org.cnr.fo3xdb.repository.FoxHourlyWeatherMetadataRepository;
-import org.cnr.fo3xdb.repository.FoxHourlyWeatherRecordRepository;
+import org.cnr.fo3xdb.repository.FoxWeatherUnitsRepository;
+import org.cnr.fo3xdb.repository.FoxWeatherRecordRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,83 +24,67 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class FoxHourlyWeatherService {
+public class FoxWeatherService extends FoxService{
 
     private static final String ZONE_EUROPE_ROME = "Europe/Rome";
-    private static final int LOWER_DAYS_BOUND = 0;
-    private static final int UPPER_DAYS_BOUND = 180;
-    private final FoxGlobalMetadataRepository globalMetadataRepository;
-    private final FoxHourlyWeatherMetadataRepository hourlyMetadataRepository;
-    private final FoxHourlyWeatherRecordRepository recordRepository;
-    private final ModelMapper mapper;
+    private final FoxWeatherUnitsRepository unitsRepository;
+    private final FoxWeatherRecordRepository recordRepository;
 
     @Autowired
-    public FoxHourlyWeatherService(
+    public FoxWeatherService(
             FoxGlobalMetadataRepository globalMetadataRepository,
-            FoxHourlyWeatherMetadataRepository hourlyMetadataRepository,
-            FoxHourlyWeatherRecordRepository recordRepository,
+            FoxWeatherUnitsRepository unitsRepository,
+            FoxWeatherRecordRepository recordRepository,
             ModelMapper mapper
     ) {
-        this.globalMetadataRepository = globalMetadataRepository;
-        this.hourlyMetadataRepository = hourlyMetadataRepository;
+        super(globalMetadataRepository, mapper);
+        this.unitsRepository = unitsRepository;
         this.recordRepository = recordRepository;
-        this.mapper = mapper;
     }
 
-    public FoxHourlyWeatherMetadataDTO getHourly(){
-        Optional<FoxHourlyWeatherMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
-        return optionalHourlyMetadata
-                .map(t -> mapper.map(t, FoxHourlyWeatherMetadataDTO.class))
+    /**
+     * This is a Javadoc
+     */
+    public FoxWeatherUnitsDTO getWeatherUnits(){
+        Optional<FoxWeatherUnitsEntity> optionalWeatherUnits = unitsRepository.findById(1L);
+        return optionalWeatherUnits
+                .map(t -> getMapper().map(t, FoxWeatherUnitsDTO.class))
                 .orElseThrow(
-                        () -> new HourlyMetadataTableException("Error retrieving hourly metadata in table.")
+                        () -> new UnitsTableException("Error in retrieving weather unit values in table.")
                 );
     }
 
-    public FoxHourlyWeatherResponseDTO retrieveRecordsByDateRange(
+    /**
+     * This is a Javadoc
+     */
+    public FoxWeatherResponseDTO retrieveWeatherRecordsByDateRange(
             LocalDate startDate,
             LocalDate endDate)
     {
         // Check if date values are correct otherwise return an Exception
         dateChecker(startDate, endDate);
+        // Get global metadata
+        FoxGlobalMetadataDTO foxGlobalMetadataDTO = globalMetadataEntity();
+        // Get weather units
+        FoxWeatherUnitsDTO unitsDTO = getWeatherUnits();
+        // Convert date in OffsetDateTime with "Europe/Rome" zone
+        OffsetDateTime odtStartDate = convertDateToOffsetDateTime(startDate, ZONE_EUROPE_ROME);
+        OffsetDateTime odtEndDate = convertDateToOffsetDateTime(endDate, ZONE_EUROPE_ROME);
 
-        // Get global metadata and map entity to DTO class
-        Optional<FoxGlobalMetadataEntity> optionalGlobalMetadata = globalMetadataRepository.findById(1L);
-        FoxGlobalMetadataDTO foxGlobalMetadataDTO = optionalGlobalMetadata
-                .map(t -> mapper.map(t, FoxGlobalMetadataDTO.class))
-                .orElseThrow(
-                        () -> new GlobalMetadataTableException("Error retrieving global metadata in table.")
-                );
-
-        // Get hourly metadata and map entity to DTO class
-        Optional<FoxHourlyWeatherMetadataEntity> optionalHourlyMetadata = hourlyMetadataRepository.findById(1L);
-        FoxHourlyWeatherMetadataDTO foxHourlyWeatherMetadataDTO = optionalHourlyMetadata
-                .map(t -> mapper.map(t, FoxHourlyWeatherMetadataDTO.class))
-                .orElseThrow(
-                        () -> new HourlyMetadataTableException("Error retrieving hourly metadata in table.")
-                );
-
-        OffsetDateTime odtStartDate = startDate
-                .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
-                .toOffsetDateTime();
-        OffsetDateTime odtEndDate = endDate
-                .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
-                .toOffsetDateTime();
-
-        // Get data
-        List<FoxHourlyWeatherRecordEntity> listRecords = recordRepository
+        // Get weather data records
+        List<FoxWeatherRecordEntity> listRecords = recordRepository
                 .findAllByTimestampBetween(odtStartDate, odtEndDate);
         if(listRecords.isEmpty()){
-            throw new RecordsNotFoundException("Records not found.");
+            throw new RecordsNotFoundException("Weather records not found.");
         }
 
-        FoxHourlyWeatherRecordsDTO foxHourlyRecords = convertRecordsToListDTO(listRecords);
+        FoxWeatherRecordsDTO foxHourlyRecords = convertRecordsToListDTO(listRecords);
 
-        return FoxHourlyWeatherResponseDTO
+        return FoxWeatherResponseDTO
                 .builder()
                 .latitude(foxGlobalMetadataDTO.getLatitude())
                 .longitude(foxGlobalMetadataDTO.getLongitude())
@@ -112,11 +93,14 @@ public class FoxHourlyWeatherService {
                 .time(foxGlobalMetadataDTO.getTime())
                 .timezone(foxGlobalMetadataDTO.getTimezone())
                 .systemOfUnits(foxGlobalMetadataDTO.getSystemOfUnits())
-                .hourlyUnits(foxHourlyWeatherMetadataDTO)
+                .hourlyUnits(unitsDTO)
                 .hourly(foxHourlyRecords)
                 .build();
     }
 
+    /**
+     * This is a Javadoc
+     */
     public ByteArrayInputStream downloadCSV(
             LocalDate startDate,
             LocalDate endDate,
@@ -125,19 +109,16 @@ public class FoxHourlyWeatherService {
         // Check if date values are correct otherwise return an Exception
         dateChecker(startDate, endDate);
 
-        OffsetDateTime odtStartDate = startDate
-                .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
-                .toOffsetDateTime();
-        OffsetDateTime odtEndDate = endDate
-                .atStartOfDay(ZoneId.of(ZONE_EUROPE_ROME))
-                .toOffsetDateTime();
+        // Convert date in OffsetDateTime with "Europe/Rome" zone
+        OffsetDateTime odtStartDate = convertDateToOffsetDateTime(startDate, ZONE_EUROPE_ROME);
+        OffsetDateTime odtEndDate = convertDateToOffsetDateTime(endDate,ZONE_EUROPE_ROME);
 
         // Get data
-        List<FoxHourlyWeatherRecordEntity> listRecords = recordRepository
+        List<FoxWeatherRecordEntity> listRecords = recordRepository
                 .findAllByTimestampBetween(odtStartDate, odtEndDate);
         if(listRecords.isEmpty()){
             String errorMessage = MessageFormat.format(
-                    "Records not found from {0} to {1}.", startDate, endDate);
+                    "Weather records not found from {0} to {1}.", startDate, endDate);
             throw new RecordsNotFoundException(errorMessage);
         }
         return CSVHelper.recordsToCSV(
@@ -146,11 +127,14 @@ public class FoxHourlyWeatherService {
         );
     }
 
-    private FoxHourlyWeatherRecordsDTO convertRecordsToListDTO(
-            List<FoxHourlyWeatherRecordEntity> records)
+    /**
+     * This is a Javadoc
+     */
+    private FoxWeatherRecordsDTO convertRecordsToListDTO(
+            List<FoxWeatherRecordEntity> records)
     {
-        FoxHourlyWeatherRecordsDTO responseDTO = new FoxHourlyWeatherRecordsDTO();
-        for(FoxHourlyWeatherRecordEntity record : records){
+        FoxWeatherRecordsDTO responseDTO = new FoxWeatherRecordsDTO();
+        for(FoxWeatherRecordEntity record : records){
             // timestamp in UTC "Europe/Rome"
             OffsetDateTime timestamp = record.getTimestamp();
             ZonedDateTime romeZonedDateTime = timestamp.atZoneSameInstant(ZoneId.of(ZONE_EUROPE_ROME));
@@ -193,20 +177,5 @@ public class FoxHourlyWeatherService {
             responseDTO.appendWindMeasurementErrors(record.getWindMeasurementErrors());
         }
         return responseDTO;
-    }
-
-    private void dateChecker(LocalDate startDate, LocalDate endDate) {
-        long flagDays = ChronoUnit.DAYS.between(startDate, endDate);
-        if(!(LOWER_DAYS_BOUND < flagDays && flagDays < UPPER_DAYS_BOUND)){
-            String errorMessage = MessageFormat.format(
-                    "The date range between start date {0} and end date {1} cannot more of {2} days.",
-                    startDate, endDate, UPPER_DAYS_BOUND);
-            if(flagDays <= LOWER_DAYS_BOUND) {
-                errorMessage = MessageFormat.format(
-                        "The start date {0} cannot be equal to or less than the end date {1}.",
-                        startDate, endDate);
-            }
-            throw new DateRangeNotValidException(errorMessage);
-        }
     }
 }

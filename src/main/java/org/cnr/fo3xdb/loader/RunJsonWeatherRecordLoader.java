@@ -1,7 +1,7 @@
 package org.cnr.fo3xdb.loader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cnr.fo3xdb.repository.FoxHourlyWeatherRecordRepository;
+import org.cnr.fo3xdb.repository.FoxWeatherRecordRepository;
 import org.springframework.boot.CommandLineRunner;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -16,10 +16,10 @@ import java.io.InputStream;
 public class RunJsonWeatherRecordLoader implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(RunJsonWeatherRecordLoader.class);
-    private final FoxHourlyWeatherRecordRepository repository;
+    private final FoxWeatherRecordRepository repository;
     private final ObjectMapper objectMapper;
 
-    public RunJsonWeatherRecordLoader(FoxHourlyWeatherRecordRepository repository, ObjectMapper mapper){
+    public RunJsonWeatherRecordLoader(FoxWeatherRecordRepository repository, ObjectMapper mapper){
         this.repository = repository;
         this.objectMapper = mapper;
     }

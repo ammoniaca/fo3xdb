@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoxHourlyWeatherRecordsDTO {
+public class FoxWeatherRecordsDTO {
 
     @JsonProperty("timestamp")
     private List<OffsetDateTime> timestamp = new ArrayList<>();

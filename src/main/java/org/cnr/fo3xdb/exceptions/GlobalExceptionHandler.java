@@ -74,9 +74,9 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
-    @ExceptionHandler(HourlyMetadataTableException.class)
+    @ExceptionHandler(UnitsTableException.class)
     public ResponseEntity<ErrorResponseDTO> handleHourlyMetadataTableException(
-            HourlyMetadataTableException ex,
+            UnitsTableException ex,
             WebRequest request)
     {
         ErrorResponseDTO error = ErrorResponseDTO

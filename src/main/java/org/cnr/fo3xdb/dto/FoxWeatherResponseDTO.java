@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoxHourlyWeatherResponseDTO {
+public class FoxWeatherResponseDTO {
 
     @JsonProperty("latitude")
     private Double latitude;
@@ -32,10 +32,10 @@ public class FoxHourlyWeatherResponseDTO {
     private String systemOfUnits;
 
     @JsonProperty("hourlyUnits")
-    private FoxHourlyWeatherMetadataDTO hourlyUnits;
+    private FoxWeatherUnitsDTO hourlyUnits;
 
     @JsonProperty("hourly")
-    public FoxHourlyWeatherRecordsDTO hourly;
+    public FoxWeatherRecordsDTO hourly;
 
 
 
