@@ -10,7 +10,7 @@ import org.cnr.fo3xdb.dto.FoxOzoneUnitsDTO;
 import org.cnr.fo3xdb.dto.FoxWeatherUnitsDTO;
 import org.cnr.fo3xdb.dto.FoxWeatherResponseDTO;
 import org.cnr.fo3xdb.enums.CSVNoDataType;
-import org.cnr.fo3xdb.enums.OzoneTimeUnit;
+import org.cnr.fo3xdb.enums.TemporalUnit;
 import org.cnr.fo3xdb.exceptions.ErrorResponseDTO;
 import org.cnr.fo3xdb.service.FoxOzoneService;
 import org.cnr.fo3xdb.service.FoxWeatherService;
@@ -118,7 +118,7 @@ public class FoxController {
             value = "/weather/json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxWeatherResponseDTO> getJSONRecords(
+    public ResponseEntity<FoxWeatherResponseDTO> getWeatherJSONRecords(
                 @RequestParam(value="start")
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                 @RequestParam(value="end")
@@ -201,13 +201,27 @@ public class FoxController {
             value = "/ozone/measurement-units",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxOzoneUnitsDTO> getFoxOzoneUnits(
-            @RequestParam(value="time") OzoneTimeUnit timeUnit
-            ){
-        FoxOzoneUnitsDTO foxOzoneUnitsDTO = ozoneService.getOzoneUnits(timeUnit);
+    public ResponseEntity<FoxOzoneUnitsDTO> getFoxOzoneUnits(){
+        FoxOzoneUnitsDTO foxOzoneUnitsDTO = ozoneService.getOzoneUnits();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(foxOzoneUnitsDTO);
     }
+
+    @GetMapping(
+            value = "/ozone/json",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> getOzoneJSONRecords(
+            @RequestParam(value="start")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value="end")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(value = "temporal") TemporalUnit temporal
+    ){
+        ozoneService.retrieveOzoneRecordsByDateRange(startDate, endDate, temporal);
+        return null;
+    }
+
 
 }

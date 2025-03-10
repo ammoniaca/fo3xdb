@@ -48,19 +48,4 @@ public abstract class FoxService {
                 .toOffsetDateTime();
     }
 
-    public void dateChecker(LocalDate startDate, LocalDate endDate) {
-        long flagDays = ChronoUnit.DAYS.between(startDate, endDate);
-        if(!(LOWER_HOURLY_DAYS_BOUND < flagDays && flagDays < UPPER_HOURLY_DAYS_BOUND)){
-            String errorMessage = MessageFormat.format(
-                    "The date range between start date {0} and end date {1} cannot more of {2} days.",
-                    startDate, endDate, UPPER_HOURLY_DAYS_BOUND);
-            if(flagDays <= LOWER_HOURLY_DAYS_BOUND) {
-                errorMessage = MessageFormat.format(
-                        "The start date {0} cannot be equal to or less than the end date {1}.",
-                        startDate, endDate);
-            }
-            throw new DateRangeNotValidException(errorMessage);
-        }
-    }
-
 }

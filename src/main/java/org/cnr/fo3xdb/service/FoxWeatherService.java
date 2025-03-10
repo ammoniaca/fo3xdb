@@ -12,6 +12,7 @@ import org.cnr.fo3xdb.exceptions.RecordsNotFoundException;
 import org.cnr.fo3xdb.repository.FoxGlobalMetadataRepository;
 import org.cnr.fo3xdb.repository.FoxWeatherUnitsRepository;
 import org.cnr.fo3xdb.repository.FoxWeatherRecordRepository;
+import org.cnr.fo3xdb.service.datevalidator.HourlyDateValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,7 @@ public class FoxWeatherService extends FoxService{
             LocalDate endDate)
     {
         // Check if date values are correct otherwise return an Exception
-        dateChecker(startDate, endDate);
+        new HourlyDateValidator(startDate, endDate).checkValidity();
         // Get global metadata
         FoxGlobalMetadataDTO foxGlobalMetadataDTO = globalMetadataEntity();
         // Get weather units
@@ -107,7 +108,7 @@ public class FoxWeatherService extends FoxService{
             CSVNoDataType noData)
     {
         // Check if date values are correct otherwise return an Exception
-        dateChecker(startDate, endDate);
+        new HourlyDateValidator(startDate, endDate).checkValidity();
 
         // Convert date in OffsetDateTime with "Europe/Rome" zone
         OffsetDateTime odtStartDate = convertDateToOffsetDateTime(startDate, ZONE_EUROPE_ROME);

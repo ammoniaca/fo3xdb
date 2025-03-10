@@ -30,7 +30,6 @@ public class RunJsonOzoneUnitsLoader implements CommandLineRunner {
             try(InputStream inputStream = TypeReference.class.getResourceAsStream("/data/ozone-units.json")) {
                 FoxOzoneUnitsEntity ozoneUnit = objectMapper.readValue(inputStream, FoxOzoneUnitsEntity.class);
                 log.info("Reading ozone units from JSON data and saving to in-memory collection.");
-                //log.info("Reading {} records from JSON ozone units and saving to in-memory collection.", AllRecords.records().size());
                 repository.save(ozoneUnit);
             } catch (IOException ex) {
                 throw new RuntimeException("Failed to read JSON ozone units", ex);

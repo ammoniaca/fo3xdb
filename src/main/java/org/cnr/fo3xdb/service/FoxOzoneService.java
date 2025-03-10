@@ -1,14 +1,17 @@
 package org.cnr.fo3xdb.service;
 
 import org.cnr.fo3xdb.dto.FoxGlobalMetadataDTO;
+import org.cnr.fo3xdb.dto.FoxHourlyOzoneResponseDTO;
 import org.cnr.fo3xdb.dto.FoxOzoneRecordDTO;
 import org.cnr.fo3xdb.dto.FoxOzoneUnitsDTO;
 import org.cnr.fo3xdb.entity.FoxOzoneUnitsEntity;
-import org.cnr.fo3xdb.enums.OzoneTimeUnit;
+import org.cnr.fo3xdb.enums.TemporalUnit;
 import org.cnr.fo3xdb.exceptions.UnitsTableException;
 import org.cnr.fo3xdb.repository.FoxGlobalMetadataRepository;
 import org.cnr.fo3xdb.repository.FoxOzoneRecordRepository;
 import org.cnr.fo3xdb.repository.FoxOzoneUnitsRepository;
+import org.cnr.fo3xdb.service.datevalidator.HourlyDateValidator;
+import org.cnr.fo3xdb.service.datevalidator.MinuteDateValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,11 +43,8 @@ public class FoxOzoneService extends FoxService{
     /**
      * This is a Javadoc
      */
-    public FoxOzoneUnitsDTO getOzoneUnits(OzoneTimeUnit timeUnit){
+    public FoxOzoneUnitsDTO getOzoneUnits(){
         Optional<FoxOzoneUnitsEntity> optionalOzoneUnits = unitsRepository.findById(1L);
-        if(timeUnit.equals(OzoneTimeUnit.HOURLY)){
-            optionalOzoneUnits = unitsRepository.findById(2L);
-        }
         if(optionalOzoneUnits.isEmpty()){
             throw new UnitsTableException("Error in retrieving ozone unit values in table.");
         }
@@ -58,12 +58,37 @@ public class FoxOzoneService extends FoxService{
     public FoxOzoneRecordDTO retrieveOzoneRecordsByDateRange(
             LocalDate startDate,
             LocalDate endDate,
-            OzoneTimeUnit timeUnit)
+            TemporalUnit temporal)
     {
         // Check if date values are correct otherwise return an Exception
-        dateChecker(startDate, endDate);
+        switch (temporal){
+            case HOURLY -> new HourlyDateValidator(startDate, endDate).checkValidity();
+            case MINUTE -> new MinuteDateValidator(startDate, endDate).checkValidity();
+        }
+
         // Get global metadata
-        FoxGlobalMetadataDTO foxGlobalMetadataDTO = globalMetadataEntity();
+        FoxGlobalMetadataDTO global = globalMetadataEntity();
+        FoxOzoneUnitsDTO units = getOzoneUnits();
+
+        FoxHourlyOzoneResponseDTO response = FoxHourlyOzoneResponseDTO
+                .builder()
+                .units(units)
+                .build();
+
+        response.setLatitude(global.getLatitude());
+        response.setLongitude(global.getLongitude());
+        response.setElevation(global.getElevation());
+        response.setExperiment(global.getExperiment());
+        response.setTime(global.getTime());
+        response.setTimezone(global.getTimezone());
+        global.setSystemOfUnits(global.getSystemOfUnits());
+
+
+
+
+
+
+
 
         return null;
     }

@@ -1,6 +1,6 @@
 package org.cnr.fo3xdb.enums;
 
-public enum OzoneTimeUnit {
+public enum TemporalUnit {
 
     MINUTE,
     HOURLY
