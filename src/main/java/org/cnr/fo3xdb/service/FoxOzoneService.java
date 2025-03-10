@@ -22,8 +22,6 @@ import java.util.Optional;
 @Service
 public class FoxOzoneService extends FoxService{
 
-    private static final int LOWER_MINUTE_DAYS_BOUND = 0;
-    private static final int UPPER_MINUTE_DAYS_BOUND = 3;
     private static final String ZONE_EUROPE_ROME = "Europe/Rome";
     private final FoxOzoneRecordRepository recordRepository;
     private final FoxOzoneUnitsRepository unitsRepository;
