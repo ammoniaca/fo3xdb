@@ -66,8 +66,9 @@ public class FoxOzoneService extends FoxService{
             case MINUTE -> new MinuteDateValidator(startDate, endDate).checkValidity();
         }
 
-        // Get global metadata
-        FoxGlobalMetadataDTO global = globalMetadataEntity();
+        // Get metadata
+        FoxGlobalMetadataDTO metadata = globalMetadataEntity();
+        // Get unit
         FoxOzoneUnitsDTO units = getOzoneUnits();
 
         FoxHourlyOzoneResponseDTO response = FoxHourlyOzoneResponseDTO
@@ -75,13 +76,13 @@ public class FoxOzoneService extends FoxService{
                 .units(units)
                 .build();
 
-        response.setLatitude(global.getLatitude());
-        response.setLongitude(global.getLongitude());
-        response.setElevation(global.getElevation());
-        response.setExperiment(global.getExperiment());
-        response.setTime(global.getTime());
-        response.setTimezone(global.getTimezone());
-        global.setSystemOfUnits(global.getSystemOfUnits());
+        response.setLatitude(metadata.getLatitude());
+        response.setLongitude(metadata.getLongitude());
+        response.setElevation(metadata.getElevation());
+        response.setExperiment(metadata.getExperiment());
+        response.setTime(metadata.getTime());
+        response.setTimezone(metadata.getTimezone());
+        metadata.setSystemOfUnits(metadata.getSystemOfUnits());
 
 
 
