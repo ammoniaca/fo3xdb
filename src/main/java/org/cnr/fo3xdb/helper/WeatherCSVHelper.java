@@ -66,7 +66,6 @@ public class WeatherCSVHelper extends CSVHelper{
                         record.getTimestamp().toString(),
                         safetyDoubleToString(record.getRainTotal(), noData),
                         safetyDoubleToString(record.getRainIntensityMax(), noData),
-                        safetyDoubleToString(record.getRainIntensityMax(), noData),
                         safetyDoubleToString(record.getAirTemperatureMin(), noData),
                         safetyDoubleToString(record.getAirTemperatureMax(), noData),
                         safetyDoubleToString(record.getAirTemperatureAvg(), noData),
