@@ -17,7 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.cnr.fo3xdb.helper.CSVHelper;
+import org.cnr.fo3xdb.helper.WeatherCSVHelper;
 
 import java.io.ByteArrayInputStream;
 import java.text.MessageFormat;
@@ -124,7 +124,7 @@ public class FoxWeatherService extends FoxService{
                     "Weather records not found from {0} to {1}.", startDate, endDate);
             throw new RecordsNotFoundException(errorMessage);
         }
-        return CSVHelper.recordsToCSV(
+        return WeatherCSVHelper.recordsToCSV(
                 listRecords,
                 noData
         );

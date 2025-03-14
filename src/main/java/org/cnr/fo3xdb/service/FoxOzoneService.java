@@ -4,9 +4,11 @@ import org.apache.commons.math3.util.Precision;
 import org.cnr.fo3xdb.dto.*;
 import org.cnr.fo3xdb.entity.FoxOzoneRecordEntity;
 import org.cnr.fo3xdb.entity.FoxOzoneUnitsEntity;
+import org.cnr.fo3xdb.enums.CSVNoDataType;
 import org.cnr.fo3xdb.enums.TemporalUnit;
 import org.cnr.fo3xdb.exceptions.RecordsNotFoundException;
 import org.cnr.fo3xdb.exceptions.UnitsTableException;
+import org.cnr.fo3xdb.helper.OzoneCSVHelper;
 import org.cnr.fo3xdb.repository.FoxGlobalMetadataRepository;
 import org.cnr.fo3xdb.repository.FoxOzoneRecordRepository;
 import org.cnr.fo3xdb.repository.FoxOzoneUnitsRepository;
@@ -16,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.text.MessageFormat;
 import java.time.*;
 import java.time.temporal.ChronoField;
@@ -100,37 +103,49 @@ public class FoxOzoneService extends FoxService{
         if(TemporalUnit.MINUTE.equals(temporal)){
             response.setRecords(convertToRecordsList(listRecords));
         } else {
-            List<OffsetDateTime> dateList = generateHourlyDates(odtStartDate, odtEndDate);
-            FoxOzoneRecordsDTO recordsAvg = new FoxOzoneRecordsDTO();
-            for (int i = 0; i < dateList.size() - 1; i++) {
-                OffsetDateTime current = dateList.get(i);
-                OffsetDateTime next = dateList.get(i + 1);
-                List<FoxOzoneRecordEntity> records = recordRepository.findAllByTimestampBetween(current, next);
-                if(!listRecords.isEmpty()){
-                    FoxOzoneRecordsDTO  recordInsideHour = convertToRecordsList(records);
-                    // add next time
-                    recordsAvg.getTimestamp().add(next);
-                    // add wind Speed hourly avg
-                    recordsAvg.getWindSpeed().add(
-                            calculateAverage(recordInsideHour.getWindSpeed(), PRECISION_SCALE));
-                    // add Ozone Level 0 hourly avg
-                    recordsAvg.getOzoneLevel0().add(
-                            calculateAverage(recordInsideHour.getOzoneLevel0(), PRECISION_SCALE));
-                    // add Ozone Level 1 hourly avg
-                    recordsAvg.getOzoneLevel1().add(
-                            calculateAverage(recordInsideHour.getOzoneLevel1(), PRECISION_SCALE));
-                    // add Ozone Level 2 hourly avg
-                    recordsAvg.getOzoneLevel2().add(
-                            calculateAverage(recordInsideHour.getOzoneLevel2(), PRECISION_SCALE));
-                }
-            }
-            response.setRecords(recordsAvg);
+            response.setRecords(convertToRecordsAvgList(odtStartDate, odtEndDate));
         }
         return response;
     }
 
+    /**
+     * This is a Javadoc
+     */
+    public ByteArrayInputStream downloadCSV(
+            LocalDate startDate,
+            LocalDate endDate,
+            CSVNoDataType noData,
+            TemporalUnit temporal)
+    {
+        // Check if date values are correct otherwise return an Exception
+        switch (temporal){
+            case HOURLY -> new HourlyDateValidator(startDate, endDate).checkValidity();
+            case MINUTE -> new MinuteDateValidator(startDate, endDate).checkValidity();
+        }
+        // Convert date in OffsetDateTime with "Europe/Rome" zone
+        OffsetDateTime odtStartDate = convertDateToOffsetDateTime(startDate, ZONE_EUROPE_ROME);
+        OffsetDateTime odtEndDate = convertDateToOffsetDateTime(endDate,ZONE_EUROPE_ROME);
+        // Get Ozone (minute) data
+        List<FoxOzoneRecordEntity> listRecords = recordRepository
+                .findAllByTimestampBetween(odtStartDate, odtEndDate);
+        if(listRecords.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Ozone records not found from {0} to {1}.", startDate, endDate);
+            throw new RecordsNotFoundException(errorMessage);
+        }
+        if(TemporalUnit.MINUTE.equals(temporal)){
+            return OzoneCSVHelper.recordsToCSV(convertToRecordsList(listRecords), noData);
+        } else {
+            return OzoneCSVHelper.recordsToCSV(convertToRecordsAvgList(odtStartDate, odtEndDate), noData);
+        }
+    }
+
+    /**
+     * This is a Javadoc
+     */
     private FoxOzoneRecordsDTO convertToRecordsList(
-            List<FoxOzoneRecordEntity> records) {
+            List<FoxOzoneRecordEntity> records)
+    {
         FoxOzoneRecordsDTO response = new FoxOzoneRecordsDTO();
         for (FoxOzoneRecordEntity record : records) {
             // timestamp in UTC "Europe/Rome"
@@ -149,6 +164,43 @@ public class FoxOzoneService extends FoxService{
         return response;
     }
 
+    /**
+     * This is a Javadoc
+     */
+    private FoxOzoneRecordsDTO convertToRecordsAvgList(
+            OffsetDateTime startDate,
+            OffsetDateTime endDate)
+    {
+        FoxOzoneRecordsDTO recordsAvg = new FoxOzoneRecordsDTO();
+        List<OffsetDateTime> dateList = generateHourlyDates(startDate, endDate);
+        for (int i = 0; i < dateList.size() - 1; i++) {
+            OffsetDateTime current = dateList.get(i);
+            OffsetDateTime next = dateList.get(i + 1);
+            List<FoxOzoneRecordEntity> records = recordRepository.findAllByTimestampBetween(current, next);
+            if(!records.isEmpty()){
+                FoxOzoneRecordsDTO  recordInsideHour = convertToRecordsList(records);
+                // add next time
+                recordsAvg.getTimestamp().add(next);
+                // add wind Speed hourly avg
+                recordsAvg.getWindSpeed().add(
+                        calculateAverage(recordInsideHour.getWindSpeed(), PRECISION_SCALE));
+                // add Ozone Level 0 hourly avg
+                recordsAvg.getOzoneLevel0().add(
+                        calculateAverage(recordInsideHour.getOzoneLevel0(), PRECISION_SCALE));
+                // add Ozone Level 1 hourly avg
+                recordsAvg.getOzoneLevel1().add(
+                        calculateAverage(recordInsideHour.getOzoneLevel1(), PRECISION_SCALE));
+                // add Ozone Level 2 hourly avg
+                recordsAvg.getOzoneLevel2().add(
+                        calculateAverage(recordInsideHour.getOzoneLevel2(), PRECISION_SCALE));
+            }
+        }
+        return recordsAvg;
+    }
+
+    /**
+     * This is a Javadoc
+     */
     private List<OffsetDateTime> generateHourlyDates(
             OffsetDateTime start, OffsetDateTime end)
     {
@@ -161,6 +213,9 @@ public class FoxOzoneService extends FoxService{
         return dates;
     }
 
+    /**
+     * This is a Javadoc
+     */
     private Double calculateAverage(List<Double> numbers, int precisionScale) {
         if (numbers == null || numbers.isEmpty()) {
             return null;

@@ -1,6 +1,7 @@
 package org.cnr.fo3xdb.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,7 +34,6 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1/fo3x")
-@Tag(name = "FO3X APIs")
 public class FoxController {
 
     private final FoxWeatherService weatherService;
@@ -69,6 +69,7 @@ public class FoxController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving FO3X weather data")
     @GetMapping(
             value = "/weather/measurement-units",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -115,15 +116,24 @@ public class FoxController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving FO3X weather data")
     @GetMapping(
             value = "/weather/json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxWeatherResponseDTO> getWeatherJSONRecords(
-                @RequestParam(value="start")
-                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                @RequestParam(value="end")
-                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
+    public ResponseEntity<FoxWeatherResponseDTO> getWeatherJSON(
+            @Parameter(
+                    description  = "Date in ISO 8601 format and represented as yyyyy-MM-dd (Year-Month-Day).",
+                    example = "2021-02-21",
+                    required = true)
+            @RequestParam(value="start")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @Parameter(
+                    description  = "Date in ISO 8601 format and represented as yyyyy-MM-dd (Year-Month-Day).",
+                    example = "2021-02-22",
+                    required = true)
+            @RequestParam(value="end")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
     {
         // get data
         FoxWeatherResponseDTO response = weatherService
@@ -171,19 +181,31 @@ public class FoxController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving FO3X weather data")
     @GetMapping(
             value = "/weather/csv",
             produces = {"application/csv"}
     )
-    public ResponseEntity<Resource> getCSVRecords(
+    public ResponseEntity<Resource> getWeatherCSV(
+            @Parameter(
+                    description  = "Date in ISO 8601 format and represented as yyyyy-MM-dd (Year-Month-Day).",
+                    example = "2021-02-21",
+                    required = true)
             @RequestParam(value="start")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @Parameter(
+                    description  = "Date in ISO 8601 format and represented as yyyyy-MM-dd (Year-Month-Day).",
+                    example = "2021-02-22",
+                    required = true)
             @RequestParam(value="end")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @Parameter(
+                    description  = "No data representation in the output.",
+                    required = true)
             @RequestParam(value = "nodata") CSVNoDataType noData)
     {
         String outMessage = MessageFormat.format(
-                "attachment; filename=FO3X_{0}_{1}.csv",
+                "attachment; filename=FO3X_WEATHER_{0}_{1}.csv",
                 startDate.toString(), endDate.toString()
         );
 
@@ -198,11 +220,31 @@ public class FoxController {
     }
 
     // OZONE
+    @Operation(
+            summary = "Find FO3X ozone data measurement units.",
+            description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
+                    "exposure) ozone data measurement units in SI (International System of Units)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully returns."
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @Tag(name = "Collection of methods used for retrieving FO3X ozone data")
     @GetMapping(
             value = "/ozone/measurement-units",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxOzoneUnitsDTO> getFoxOzoneUnits(){
+    public ResponseEntity<FoxOzoneUnitsDTO> getOzoneUnits(){
         FoxOzoneUnitsDTO foxOzoneUnitsDTO = ozoneService.getOzoneUnits();
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -245,15 +287,27 @@ public class FoxController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving FO3X ozone data")
     @GetMapping(
             value = "/ozone/json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FoxOzoneResponseDTO> getOzoneJSONRecords(
+    public ResponseEntity<FoxOzoneResponseDTO> getOzoneJSON(
+            @Parameter(
+                    description  = "Date in ISO 8601 format and represented as yyyyy-MM-dd (Year-Month-Day).",
+                    example = "2021-06-12",
+                    required = true)
             @RequestParam(value="start")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @Parameter(
+                    description  = "Date in ISO 8601 format and represented as yyyyy-MM-dd (Year-Month-Day).",
+                    example = "2021-06-14",
+                    required = true)
             @RequestParam(value="end")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @Parameter(
+                    description  = "Specifies the time range of the output.",
+                    required = true)
             @RequestParam(value = "temporal") TemporalUnit temporal
     ){
         FoxOzoneResponseDTO response = ozoneService
@@ -264,5 +318,79 @@ public class FoxController {
                 .body(response);
     }
 
+    @Operation(
+            summary = "Search for FO3X ozone data given a specific date range.",
+            description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
+                    "exposure) ozone data in a specific date range and produce a CSV (comma-separated values) file format."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully returns a CSV (comma-separated values) file format."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @Tag(name = "Collection of methods used for retrieving FO3X ozone data")
+    @GetMapping(
+            value = "/ozone/csv",
+            produces = {"application/csv"}
+    )
+    public ResponseEntity<Resource> getOzoneCSV(
+            @Parameter(
+                    description  = "Date in ISO 8601 format and represented as yyyyy-MM-dd (Year-Month-Day).",
+                    example = "2021-06-12",
+                    required = true)
+            @RequestParam(value="start")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @Parameter(
+                    description  = "Date in ISO 8601 format and represented as yyyyy-MM-dd (Year-Month-Day).",
+                    example = "2021-06-14",
+                    required = true)
+            @RequestParam(value="end")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @Parameter(
+                    description  = "Specifies the time range of the output.",
+                    required = true)
+            @RequestParam(value = "temporal") TemporalUnit temporal,
+            @Parameter(
+                    description  = "No data representation in the output.",
+                    required = true)
+            @RequestParam(value = "nodata") CSVNoDataType noData)
+    {
+        String outMessage = MessageFormat.format(
+                "attachment; filename=FO3X_OZONE_{0}_{1}_{2}.csv",
+                temporal.toString(), startDate.toString(), endDate.toString());
 
+        InputStreamResource file = new InputStreamResource(
+                ozoneService.downloadCSV(startDate, endDate, noData, temporal)
+        );
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, outMessage)
+                .contentType(MediaType.parseMediaType("application/csv"))
+                .body(file);
+    }
 }

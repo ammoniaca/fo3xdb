@@ -33,7 +33,7 @@ public class FoxOzoneResponseDTO {
     @JsonProperty("systemOfUnits")
     private String systemOfUnits;
 
-    @JsonProperty("temporal")
+    @JsonProperty("temporalRange")
     private TemporalUnit temporal;
 
     @JsonProperty("units")
