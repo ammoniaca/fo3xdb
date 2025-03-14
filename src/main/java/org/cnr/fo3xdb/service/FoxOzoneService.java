@@ -3,7 +3,6 @@ package org.cnr.fo3xdb.service;
 import org.cnr.fo3xdb.dto.*;
 import org.cnr.fo3xdb.entity.FoxOzoneRecordEntity;
 import org.cnr.fo3xdb.entity.FoxOzoneUnitsEntity;
-import org.cnr.fo3xdb.entity.FoxWeatherRecordEntity;
 import org.cnr.fo3xdb.enums.TemporalUnit;
 import org.cnr.fo3xdb.exceptions.RecordsNotFoundException;
 import org.cnr.fo3xdb.exceptions.UnitsTableException;
@@ -58,7 +57,7 @@ public class FoxOzoneService extends FoxService{
     /**
      * This is a Javadoc
      */
-    public FoxOzoneRecordDTO retrieveOzoneRecordsByDateRange(
+    public FoxOzoneResponseDTO fetchOzoneByDateRange(
             LocalDate startDate,
             LocalDate endDate,
             TemporalUnit temporal)
@@ -99,17 +98,18 @@ public class FoxOzoneService extends FoxService{
                     "Ozone records not found from {0} to {1}.", startDate, endDate);
             throw new RecordsNotFoundException(errorMessage);
         }
+        if(TemporalUnit.MINUTE.equals(temporal)){
+            response.setRecords(convertToRecordsList(listRecords));
+        }
 
-
-
-        return null;
+        return response;
     }
 
-    private FoxOzoneRecordsDTO convertRecordsToListDTO(
-            List<FoxOzoneRecordDTO> records)
+    private FoxOzoneRecordsDTO convertToRecordsList(
+            List<FoxOzoneRecordEntity> records)
     {
         FoxOzoneRecordsDTO response = new FoxOzoneRecordsDTO();
-        for(FoxOzoneRecordDTO record : records){
+        for(FoxOzoneRecordEntity record : records){
             // timestamp in UTC "Europe/Rome"
             OffsetDateTime timestamp = record.getTimestamp();
             ZonedDateTime romeZonedDateTime = timestamp.atZoneSameInstant(ZoneId.of(ZONE_EUROPE_ROME));

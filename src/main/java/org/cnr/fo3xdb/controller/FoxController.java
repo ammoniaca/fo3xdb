@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.cnr.fo3xdb.dto.FoxOzoneResponseDTO;
 import org.cnr.fo3xdb.dto.FoxOzoneUnitsDTO;
 import org.cnr.fo3xdb.dto.FoxWeatherUnitsDTO;
 import org.cnr.fo3xdb.dto.FoxWeatherResponseDTO;
@@ -208,19 +209,59 @@ public class FoxController {
                 .body(foxOzoneUnitsDTO);
     }
 
+
+    @Operation(
+            summary = "Search for FO3X ozone data given a specific date range.",
+            description = "This endpoint allows users to search for FO3X (Ozone FACE – free air controlled " +
+                    "exposure) ozone data in a specific date range and produce a JSON (JavaScript Object Notation) format."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully returns a JSON (JavaScript Object Notation) file format."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
     @GetMapping(
             value = "/ozone/json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getOzoneJSONRecords(
+    public ResponseEntity<FoxOzoneResponseDTO> getOzoneJSONRecords(
             @RequestParam(value="start")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value="end")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(value = "temporal") TemporalUnit temporal
     ){
-        ozoneService.retrieveOzoneRecordsByDateRange(startDate, endDate, temporal);
-        return null;
+        FoxOzoneResponseDTO response = ozoneService
+                .fetchOzoneByDateRange(startDate, endDate, temporal);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 
 
