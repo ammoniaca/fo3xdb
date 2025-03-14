@@ -80,7 +80,9 @@ public class FoxWeatherService extends FoxService{
         List<FoxWeatherRecordEntity> listRecords = recordRepository
                 .findAllByTimestampBetween(odtStartDate, odtEndDate);
         if(listRecords.isEmpty()){
-            throw new RecordsNotFoundException("Weather records not found.");
+            String errorMessage = MessageFormat.format(
+                    "Weather records not found from {0} to {1}.", startDate, endDate);
+            throw new RecordsNotFoundException(errorMessage);
         }
 
         FoxWeatherRecordsDTO foxHourlyRecords = convertRecordsToListDTO(listRecords);
@@ -95,7 +97,7 @@ public class FoxWeatherService extends FoxService{
                 .timezone(foxGlobalMetadataDTO.getTimezone())
                 .systemOfUnits(foxGlobalMetadataDTO.getSystemOfUnits())
                 .hourlyUnits(unitsDTO)
-                .hourly(foxHourlyRecords)
+                .records(foxHourlyRecords)
                 .build();
     }
 
@@ -134,49 +136,48 @@ public class FoxWeatherService extends FoxService{
     private FoxWeatherRecordsDTO convertRecordsToListDTO(
             List<FoxWeatherRecordEntity> records)
     {
-        FoxWeatherRecordsDTO responseDTO = new FoxWeatherRecordsDTO();
+        FoxWeatherRecordsDTO response = new FoxWeatherRecordsDTO();
         for(FoxWeatherRecordEntity record : records){
             // timestamp in UTC "Europe/Rome"
             OffsetDateTime timestamp = record.getTimestamp();
             ZonedDateTime romeZonedDateTime = timestamp.atZoneSameInstant(ZoneId.of(ZONE_EUROPE_ROME));
-            responseDTO.appendTimestamp(romeZonedDateTime.toOffsetDateTime());
+            response.getTimestamp().add(romeZonedDateTime.toOffsetDateTime());
             // Rain (total, max)
-            responseDTO.appendRainTotal(record.getRainTotal());
-            responseDTO.appendRainIntensityMax(record.getRainIntensityMax());
+            response.getRainTotal().add(record.getRainTotal());
+            response.getRainIntensityMax().add(record.getRainIntensityMax());
             // Air_temperature (Min, Max, Avg)
-            responseDTO.appendAirTemperatureMin(record.getAirTemperatureMin());
-            responseDTO.appendAirTemperatureMax(record.getAirTemperatureMax());
-            responseDTO.appendAirTemperatureAvg(record.getAirTemperatureAvg());
+            response.getAirTemperatureMin().add(record.getAirTemperatureMin());
+            response.getAirTemperatureMax().add(record.getAirTemperatureMax());
+            response.getAirTemperatureAvg().add(record.getAirTemperatureAvg());
             // air_humidity (Avg)
-            responseDTO.appendAirHumidityAvg(record.getAirHumidityAvg());
+            response.getAirHumidityAvg().add(record.getAirHumidityAvg());
             // dew_point
-            responseDTO.appendAirDewPoint(record.getDewPoint());
+            response.getDewPoint().add(record.getDewPoint());
             // air_pressure (Avg)
-            responseDTO.appendAirPressureAvg(record.getAirPressureAvg());
-            // Solar_radiation (Max, Min, Avg)
-            responseDTO.appendSolarRadiationMax(record.getSolarRadiationMax());
-            responseDTO.appendSolarRadiationMin(record.getSolarRadiationMin());
-            responseDTO.appendSolarRadiationAvg(record.getSolarRadiationAvg());
+            response.getAirPressureAvg().add(record.getAirPressureAvg());
+            // Solar_radiation (Min, Max, Avg, calculated)
+            response.getSolarRadiationMin().add(record.getSolarRadiationMin());
+            response.getSolarRadiationMax().add(record.getSolarRadiationMax());
+            response.getSolarRadiationAvg().add(record.getSolarRadiationAvg());
+            response.getSolarRadiationCalculated().add(record.getSolarRadiationCalculated());
             // Wind (avg, direction_avg, direction_std, speed_max, direction_at_max_speed)
-            responseDTO.appendWindSpeedAvg(record.getWindSpeedAvg());
-            responseDTO.appendWindDirectionAvg(record.getWindDirectionAvg());
-            responseDTO.appendWindDirectionSTD(record.getWindDirectionSTD());
-            responseDTO.appendWindSpeedMax(record.getWindSpeedMax());
-            responseDTO.appendWindDirectionAtMaximumSpeed(record.getWindDirectionAtMaximumSpeed());
+            response.getWindSpeedAvg().add(record.getWindSpeedAvg());
+            response.getWindDirectionAvg().add(record.getWindDirectionAvg());
+            response.getWindDirectionSTD().add(record.getWindDirectionSTD());
+            response.getWindSpeedMax().add(record.getWindSpeedMax());
+            response.getWindDirectionAtMaximumSpeed().add(record.getWindDirectionAtMaximumSpeed());
             // Evapotranspiration
-            responseDTO.appendEvapotranspiration(record.getEvapotranspiration());
-            // Solar_Radiation_Calculated
-            responseDTO.appendSolarRadiationCalculated(record.getSolarRadiationCalculated());
+            response.getEvapotranspiration().add(record.getEvapotranspiration());
             // Instrument (battery, data_logger)
-            responseDTO.appendBatteryVoltage(record.getBatteryVoltage());
-            responseDTO.appendDataLoggerTemperature(record.getDataLoggerTemperature());
+            response.getBatteryVoltage().add(record.getBatteryVoltage());
+            response.getDataLoggerTemperature().add(record.getDataLoggerTemperature());
             // Errors measurement (air_temperature, air_humidity, atmospheric_pressure, solar_Radiation, wind_measurement)
-            responseDTO.appendAirTemperatureMeasurementErrors(record.getAirTemperatureMeasurementErrors());
-            responseDTO.appendAirHumidityMeasurementErrors(record.getAirHumidityMeasurementErrors());
-            responseDTO.appendAtmosphericPressureMeasurementErrors(record.getAtmosphericPressureMeasurementErrors());
-            responseDTO.appendSolarRadiationMeasurementErrors(record.getSolarRadiationMeasurementErrors());
-            responseDTO.appendWindMeasurementErrors(record.getWindMeasurementErrors());
+            response.getAirTemperatureMeasurementErrors().add(record.getAirTemperatureMeasurementErrors());
+            response.getAirHumidityMeasurementErrors().add(record.getAirHumidityMeasurementErrors());
+            response.getAtmosphericPressureMeasurementErrors().add(record.getAtmosphericPressureMeasurementErrors());
+            response.getSolarRadiationMeasurementErrors().add(record.getSolarRadiationMeasurementErrors());
+            response.getWindMeasurementErrors().add(record.getWindMeasurementErrors());
         }
-        return responseDTO;
+        return response;
     }
 }

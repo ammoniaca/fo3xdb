@@ -31,12 +31,11 @@ public class FoxWeatherResponseDTO {
     @JsonProperty("systemOfUnits")
     private String systemOfUnits;
 
-    @JsonProperty("hourlyUnits")
+    @JsonProperty("units")
     private FoxWeatherUnitsDTO hourlyUnits;
 
-    @JsonProperty("hourly")
-    public FoxWeatherRecordsDTO hourly;
-
+    @JsonProperty("data")
+    public FoxWeatherRecordsDTO records;
 
 
 }

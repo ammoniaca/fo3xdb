@@ -2,13 +2,15 @@ package org.cnr.fo3xdb.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.cnr.fo3xdb.enums.TemporalUnit;
+
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoxResponseDTO {
+public class FoxOzoneResponseDTO {
 
     @JsonProperty("latitude")
     private Double latitude;
@@ -30,5 +32,14 @@ public class FoxResponseDTO {
 
     @JsonProperty("systemOfUnits")
     private String systemOfUnits;
+
+    @JsonProperty("temporal")
+    private TemporalUnit temporal;
+
+    @JsonProperty("units")
+    private FoxOzoneUnitsDTO units;
+
+    @JsonProperty("data")
+    private FoxOzoneRecordsDTO records;
 
 }
