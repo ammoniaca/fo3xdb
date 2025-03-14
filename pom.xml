@@ -78,6 +78,11 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.17.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.6</version>
+		</dependency>
 
 <!--		&lt;!&ndash; https://mvnrepository.com/artifact/com.opencsv/opencsv &ndash;&gt;-->
 <!--		<dependency>-->
@@ -131,8 +136,15 @@
 			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+			<id>maven_central</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2/</url>
+		</repository>
+	</repositories>
 
-<!--	<build>-->
+	<!--	<build>-->
 <!--		<plugins>-->
 <!--			<plugin>-->
 <!--				<groupId>org.apache.maven.plugins</groupId>-->

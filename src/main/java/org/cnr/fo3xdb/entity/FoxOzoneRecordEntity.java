@@ -33,45 +33,20 @@ public class FoxOzoneRecordEntity {
     @Column(name="wind_speed", length = 50)
     private Double windSpeed;
 
+    // level 0
+
     @Column(name="ozone_level0", length = 50)
     private Double ozoneLevel0;
-
-    @Column(name="temperature_level0", length = 50)
-    private Double temperatureLevel0;
-
-    @Column(name="pressure_level0", length = 50)
-    private Double pressureLevel0;
-
-    @Column(name="flow_level0", length = 50)
-    private Double flowLevel0;
 
     // level 1
 
     @Column(name="ozone_level1", length = 50)
     private Double ozoneLevel1;
 
-    @Column(name="temperature_level1", length = 50)
-    private Double temperatureLevel1;
-
-    @Column(name="pressure_level1", length = 50)
-    private Double pressureLevel1;
-
-    @Column(name="flow_level1", length = 50)
-    private Double flowLevel1;
-
     // level 2
 
     @Column(name="ozone_level2", length = 50)
     private Double ozoneLevel2;
-
-    @Column(name="temperature_level2", length = 50)
-    private Double temperatureLevel2;
-
-    @Column(name="pressure_level2", length = 50)
-    private Double pressureLevel2;
-
-    @Column(name="flow_level2", length = 50)
-    private Double flowLevel2;
 
     public void setTimestamp(OffsetDateTime timestamp) {
         ZonedDateTime romeZonedDateTime = timestamp.atZoneSameInstant(ZoneId.of(ZONE_ID));
