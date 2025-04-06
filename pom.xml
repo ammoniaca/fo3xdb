@@ -68,6 +68,8 @@
 
 		<!-- Added to me -->
 
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
+
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
